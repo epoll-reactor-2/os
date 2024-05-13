@@ -1,0 +1,12 @@
+1) https://wiki.osdev.org/Bare_Bones
+
+2) TODO: Bufferize VGA output, make scroll when cursor will
+         reach bottom.
+   TODO: Handle keyboard and mouse events in QEMU, catch in kernel.
+
+3) Run editor with local config:
+   $ MICRO_CONFIG_HOME=.config/micro micro
+   ... or
+   in ~/.zshrc:
+   export MICRO_CONFIG_HOME=.config/micro
+   Then micro will search local directory for config.

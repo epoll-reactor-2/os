@@ -1,0 +1,41 @@
+{
+    "*.S": {
+        "tabsize": 8,
+        "tabstospaces": false
+    },
+    "*.c": {
+        "tabsize": 8,
+        "tabstospaces": false
+    },
+    "*.dts": {
+        "tabstospaces": false
+    },
+    "*.dtsi": {
+        "tabstospaces": false
+    },
+    "*.h": {
+        "tabsize": 8,
+        "tabstospaces": false
+    },
+    "*.mk": {
+        "tabsize": 8,
+        "tabstospaces": false
+    },
+    "Makefile": {
+        "tabsize": 8,
+        "tabstospaces": false
+    },
+    "auto_update": false,
+    "colorscheme": "monokai-dark",
+    "comment": {
+        ".S": "#",
+        ".c": "#"
+    },
+    "eofnewline": false,
+    "ignorecase": false,
+    "pluginchannels": [
+        "https://raw.githubusercontent.com/micro-editor/plugin-channel/master/channel.json"
+    ],
+    "pluginrepos": [],
+    "tabstospaces": true
+}
