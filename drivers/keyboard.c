@@ -48,7 +48,7 @@ static void keyboard_callback(__unused struct registers regs)
 	}
 }
 
-void init_keyboard()
+void keyboard_init()
 {
 	register_interrupt_handler(IRQ1, keyboard_callback); 
 }

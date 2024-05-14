@@ -145,7 +145,9 @@ void irq_handler(struct registers r)
 
 void irq_install()
 {
+	/* Set the interrupt flag (IF) in the EFLAGS register.
+	   Or simply "enable interrupts". */
 	asm volatile("sti");
 	timer_init(50);
-	init_keyboard();
+	keyboard_init();
 }

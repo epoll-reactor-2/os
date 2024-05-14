@@ -29,21 +29,23 @@ u32 chs_to_lba(u32 cylinder, u32 head, u32 sector)
 
 int detect_devtype(int slavebit)
 {
-	u32 REG_CYL_LO=4, REG_CYL_HI=5, REG_DEVSEL=6;
+	u32 reg_cyl_lo = 4;
+	u32 reg_cyl_hi = 5;
+	u32 reg_devsel = 6;
 	/* waits until master drive is ready again */
 	// ata_soft_reset(ctrl->dev_ctl);		
-	port_byte_out(ATA_PRIMARY_IO + REG_DEVSEL, 0xA0 | slavebit<<4);
+	port_byte_out(ATA_PRIMARY_IO + reg_devsel, 0xA0 | slavebit << 4);
 	// 400ns seconds delay
 	ide_delay(4);
 
-	u32 cl = port_byte_in(ATA_PRIMARY_IO + REG_CYL_LO);	/* get the "signature bytes" */
-	u32 ch = port_byte_in(ATA_PRIMARY_IO + REG_CYL_HI);
+	u32 cl = port_byte_in(ATA_PRIMARY_IO + reg_cyl_lo);	/* get the "signature bytes" */
+	u32 ch = port_byte_in(ATA_PRIMARY_IO + reg_cyl_hi);
 
 	/* differentiate ATA, ATAPI, SATA and SATAPI */
-	if (cl==0x14 && ch == 0xEB) return 0;
-	if (cl==0x69 && ch == 0x96) return 1;
-	if (cl==0x00 && ch == 0x00) return 2;
-	if (cl==0x3c && ch == 0xc3) return 3;
+	if (cl == 0x14 && ch == 0xEB) return 0;
+	if (cl == 0x69 && ch == 0x96) return 1;
+	if (cl == 0x00 && ch == 0x00) return 2;
+	if (cl == 0x3c && ch == 0xc3) return 3;
 	return -1;
 }
 
