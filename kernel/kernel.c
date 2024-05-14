@@ -6,6 +6,18 @@
 #include "drivers/ata.h"
 #include "fs.h"
 
+void help()
+{
+	kprint("Ready for input. Commands:\n"
+		"DIE       - to halt the CPU \n"
+		"ATA RESET - to do software reset on ATA Primary drive \n"
+		"FS INIT   - to init filesystem (Work in Progress!)\n"
+		"CLEAR     - clear screen\n"
+		"HELP      - print help\n"
+		"> "
+	);	
+}
+
 void kernel_main()
 {
 	isr_install();
@@ -13,12 +25,7 @@ void kernel_main()
 
 	vga_init();
 
-	kprint("Ready for input. Commands:\n"
-		"DIE       - to halt the CPU \n"
-		"ATA RESET - to do software reset on ATA Primary drive \n"
-		"FS INIT   - to init filesystem (Work in Progress!)\n"
-		"> "
-	);
+	help();
 }
 
 void user_input(char *input)
@@ -31,6 +38,10 @@ void user_input(char *input)
 		ata_init();
 	} else if (strcmp(input, "FS INIT") == 0) {
 		fs_init();
+	} else if (strcmp(input, "CLEAR") == 0) {
+		vga_init();
+	} else if (strcmp(input, "HELP") == 0) {
+		help();
 	} else {
 		kprint("Command not found.");
 	}
