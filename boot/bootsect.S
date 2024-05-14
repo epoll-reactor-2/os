@@ -14,12 +14,12 @@ call load_kernel ; read the kernel from disk
 call switch_to_pm ; disable interrupts, load GDT,  etc. Finally jumps to 'BEGIN_PM'
 jmp $ ; Never executed
 
-%include "boot/print.asm"
-%include "boot/print_hex.asm"
-%include "boot/disk.asm"
-%include "boot/gdt.asm"
-%include "boot/32bit-print.asm"
-%include "boot/switch_to_pm.asm"
+%include "boot/print.S"
+%include "boot/print_hex.S"
+%include "boot/disk.S"
+%include "boot/gdt.S"
+%include "boot/32bit-print.S"
+%include "boot/switch_to_pm.S"
 
 [bits 16]
 load_kernel:

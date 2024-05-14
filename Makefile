@@ -47,11 +47,11 @@ debug: os-image.bin kernel.elf
 	@echo $(CC_LABEL) $<
 	@$(CC) $(CFLAGS) -ffreestanding -c $< -o $@
 
-%.o: %.asm
+%.o: %.S
 	@echo $(AS_LABEL) $<
 	@nasm $< -f elf -o $@
 
-%.bin: %.asm
+%.bin: %.S
 	@echo $(AS_LABEL) $<
 	@nasm $< -f bin -o $@
 
