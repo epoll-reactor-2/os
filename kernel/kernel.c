@@ -1,48 +1,38 @@
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include "vga.h"
-#include "lib/stdlib.h"
+#include "cpu/isr.h"
+#include "cpu/timer.h"
+#include "lib/string.h"
+#include "lib/mem.h"
+#include "drivers/vga.h"
+#include "drivers/ata.h"
+#include "fs.h"
 
-void kprint(const char* data)
+void kernel_main()
 {
-	while (*data)
-		vga_putchar(*data++);
-}
+	isr_install();
+	irq_install();
 
-void kernel_main(void)
-{
-	/* Initialize terminal interface */
 	vga_init();
 
-	/* Newline support is left as an exercise. */
-	kprint("Hello world\n");
-	kprint("Message 1\n");
-	kprint("Message 2\n");
-	kprint("Message 3\n");
-	kprint("Message 4\n");
-	kprint("Message 5\n");
-	kprint("Message 6\n");
-	kprint("Message 7\n");
-	kprint("Message 8\n");
-	kprint("Message 9\n");
-	kprint("Message __10\n");
-	kprint("Message 11\n");
-	kprint("Message __12\n");
-	kprint("Message 13\n");
-	kprint("Message __14\n");
-	kprint("Message 15\n");
-	kprint("Message __16\n");
-	kprint("Message 17\n");
-	kprint("Message ______18\n");
-	kprint("Message 19\n");
-	kprint("Message _____20\n");
-	kprint("Message 21\n");
-	kprint("Message ____22\n");
-	kprint("Message 23\n");
-	kprint("Message ___24\n");
-	kprint("Message 25\n");
-	kprint("Message __26\n");
-	kprint("Message 27\n");
-	kprint("Message __28\n");
+	kprint("Ready for input. Commands:\n"
+		"DIE       - to halt the CPU \n"
+		"ATA RESET - to do software reset on ATA Primary drive \n"
+		"FS INIT   - to init filesystem (Work in Progress!)\n"
+		"> "
+	);
+}
+
+void user_input(char *input)
+{
+	if (strcmp(input, "DIE") == 0) {
+		kprint("Stopping the CPU\n");
+		asm volatile("hlt");
+	} else if (strcmp(input, "ATA RESET") == 0) {
+		kprint("ATA software is reset");
+		ata_init();
+	} else if (strcmp(input, "FS INIT") == 0) {
+		fs_init();
+	} else {
+		kprint("Command not found.");
+	}
+	kprint("\n> ");
 }

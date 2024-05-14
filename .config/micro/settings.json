@@ -3,6 +3,10 @@
         "tabsize": 8,
         "tabstospaces": false
     },
+    "*.asm": {
+        "tabsize": 8,
+        "tabstospaces": false
+    },
     "*.c": {
         "tabsize": 8,
         "tabstospaces": false

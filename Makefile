@@ -1,59 +1,60 @@
-##################################
-# Variables                      #
-##################################
+C_SOURCES = $(wildcard kernel/*.c drivers/*.c cpu/*.c lib/*.c)
+# Nice syntax for file extension replacement
+OBJ = ${C_SOURCES:.c=.o cpu/interrupt.o}
 
 # +----------+-----------------------+
 # | Arch     | i686-elf-*            |
 # | Ubuntu   | i686-linux-gnu-*      |
 # +----------+-----------------------+
+CC = /usr/bin/i386-elf-gcc
+GDB = /usr/bin/i386-elf-gdb
+LD = /usr/bin/i386-elf-ld
+# -g: Use debugging symbols in gcc
+CFLAGS = -g -ffreestanding -Wall -Wextra -fno-exceptions -m32 -I.
 
-AS 		= i686-linux-gnu-as
-CC 		= i686-linux-gnu-gcc-12
-KERNEL_BIN	= kernel.elf
-LINK_SRC	= kernel/link.ld
-CFLAGS		= -std=gnu99 -ffreestanding -O2 -nostdlib -I.
-WARN_CFLAGS	= -Wall -Wextra
+IMAGE_SIZE = 5M
 
-SRC_DIR		= kernel lib
-SRC 		= $(shell find $(SRC_DIR) -name '*.c')
-OBJ 		= $(SRC:.c=.o)
+AS_LABEL = "    AS "
+CC_LABEL = "    CC "
+LD_LABEL = "    LD "
 
-ASM_SRC		= $(shell find $(SRC_DIR) -name '*.S')
-ASM_OBJ		= $(ASM_SRC:.S=.o)
+# First rule is run by default
+os-image.bin: boot/bootsect.bin kernel.bin
+	cat $^ > os-image.bin & qemu-img resize -f raw os-image.bin ${IMAGE_SIZE}
 
-AS_LABEL	:= "     AS  "
-CC_LABEL	:= "     CC  "
-LD_LABEL	:= "     LD  "
+# '--oformat binary' deletes all symbols as a collateral, so we don't need
+# to 'strip' them manually on this case
+kernel.bin: boot/kernel_entry.o $(OBJ)
+	@echo $(LD_LABEL) $<
+	@$(LD) -o $@ -Ttext 0x1000 $^ --oformat binary
 
-##################################
-# Targets                        #
-##################################
+# Used for debugging purposes
+kernel.elf: boot/kernel_entry.o $(OBJ)
+	@echo $(LD_LABEL) $<
+	@$(LD) -o $@ -Ttext 0x1000 $^ 
 
-all: $(KERNEL_BIN)
+run: os-image.bin
+	qemu-system-i386 -drive if=ide,format=raw,file=os-image.bin,readonly=off
 
-# C sources
+# Open the connection to qemu and load our kernel-object file with symbols
+debug: os-image.bin kernel.elf
+	qemu-system-i386 -s -S -drive if=ide,format=raw,file=os-image.bin,readonly=off -d guest_errors,int &
+	$(GDB) -ex "target remote localhost:1234" -ex "symbol-file kernel.elf"
+
+# Generic rules for wildcards
+# To make an object, always compile from its .c
 %.o: %.c
-	@echo $(CC_LABEL) $(@F)
-	@$(CC) -c $(CFLAGS) $(WARN_CFLAGS) $^ -o $@
+	@echo $(CC_LABEL) $<
+	@$(CC) $(CFLAGS) -ffreestanding -c $< -o $@
 
-# Assembly sources
-%.o: %.S
-	@echo $(AS_LABEL) $(@F)
-	@$(AS) $^ -o $@
+%.o: %.asm
+	@echo $(AS_LABEL) $<
+	@nasm $< -f elf -o $@
 
-# Link C and Assembly files into single kernel image.
-$(KERNEL_BIN): $(OBJ) $(ASM_OBJ)
-	@echo $(LD_LABEL) $(@F)
-	@$(CC) -T $(LINK_SRC) -o $(KERNEL_BIN) $(CFLAGS) $(OBJ) $(ASM_OBJ) -lgcc
+%.bin: %.asm
+	@echo $(AS_LABEL) $<
+	@nasm $< -f bin -o $@
 
-##################################
-# Phony targets                  #
-##################################
-
-.PHONY: clean
 clean:
-	@rm -rf $(OBJ) $(ASM_OBJ) $(KERNEL_BIN)
-
-.PHONY: run
-run:
-	qemu-system-i386 -kernel $(KERNEL_BIN)
+	rm -rf *.bin *.dis *.o os-image.bin *.elf
+	rm -rf kernel/*.o boot/*.bin drivers/*.o boot/*.o libc/*.o cpu/*.o
