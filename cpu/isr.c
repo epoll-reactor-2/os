@@ -164,6 +164,8 @@ void register_interrupt_handler(u8 n, isr_t handler)
 	interrupt_handlers[n] = handler;
 }
 
+/* NOTE: This function periodically called to handle
+         IRQ0 - timer interrupt. */
 void irq_handler(struct registers r)
 {
 	/* After every interrupt we need to send an EOI to the PICs
