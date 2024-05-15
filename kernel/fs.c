@@ -17,7 +17,7 @@ void fs_init()
 	u16 *tmp = ata_read(t, 1);
 
 	for (int i = 0; i < 16; i++) {
-		char* str = (char*) kmalloc(sizeof(char) * 6);
+		char str[6];
 		hex_to_ascii(tmp[i], str);
 		kprint(str);
 		kprint("\n");
