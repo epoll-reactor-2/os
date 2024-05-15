@@ -7,6 +7,6 @@
 #define ENTER		0x1C
 #define SC_MAX		57
 
-void keyboard_init();
+void keyboard_install();
 
 #endif /* KERNEL_DRIVERS_KEYBOARD_H */

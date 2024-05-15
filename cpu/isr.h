@@ -71,7 +71,9 @@ extern void irq15();
 #define IRQ14 46
 #define IRQ15 47
 
-/* Struct which aggregates many registers */
+/* Struct which aggregates many registers
+   TODO: Where this structure and order of registers
+         is specified? */
 struct registers {
 	u32 ds; /* Data segment selector */
 	u32 edi, esi, ebp, esp, ebx, edx, ecx, eax; /* Pushed by pusha. */

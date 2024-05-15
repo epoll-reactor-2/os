@@ -1,3 +1,4 @@
+/* https://wiki.osdev.org/IRQ */
 #include "isr.h"
 #include "idt.h"
 #include "ports.h"
@@ -184,6 +185,6 @@ void irq_install()
 	   Or simply "enable interrupts". */
 	asm volatile("sti");
 	timer_init(50);
-	keyboard_init();
-	mouse_init();
+	keyboard_install();
+	mouse_install();
 }

@@ -49,7 +49,7 @@ static void keyboard_callback(__unused struct registers regs)
 	}
 }
 
-void keyboard_init()
+void keyboard_install()
 {
 	register_interrupt_handler(IRQ1, keyboard_callback);
 }

@@ -55,7 +55,7 @@ static void mouse_callback(__unused struct registers regs)
 	/* u8 scancode = */ port_byte_in(PS2_PORT);
 }
 
-void mouse_init()
+void mouse_install()
 {
 	/* TODO: What is this mean? */
 	mouse_wait(1);
