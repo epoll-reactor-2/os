@@ -18,7 +18,7 @@ isr_common_stub:
 	call isr_handler
 
 	; 3. Restore state
-	pop eax 
+	pop eax
 	mov ds, ax
 	mov es, ax
 	mov fs, ax
@@ -27,7 +27,7 @@ isr_common_stub:
 	add esp, 8 ; Cleans up the pushed error code and pushed ISR number
 	sti
 	iret ; pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP
-	
+
 ; We don't get information about which interrupt was caller
 ; when the handler is run, so we will need to have a different handler
 ; for every interrupt.
@@ -35,10 +35,11 @@ isr_common_stub:
 ; don't, so we will push a dummy error code for those which don't, so that
 ; we have a consistent stack for all of them.
 
-; Common IRQ code. Identical to ISR code except for the 'call' 
+; Common IRQ code. Identical to ISR code except for the 'call'
 ; and the 'pop ebx'
 irq_common_stub:
-	pusha 
+	; 1. Save CPU state
+	pusha
 	mov ax, ds
 	push eax
 	mov ax, 0x10
@@ -46,7 +47,11 @@ irq_common_stub:
 	mov es, ax
 	mov fs, ax
 	mov gs, ax
+
+	; 2. Call C handler
 	call irq_handler ; Different than the ISR code
+
+	; 3. Restore state
 	pop ebx  ; Different than the ISR code
 	mov ds, bx
 	mov es, bx
@@ -55,7 +60,7 @@ irq_common_stub:
 	popa
 	add esp, 8
 	sti
-	iret 
+	iret
 
 ; First make the ISRs global
 global isr0
@@ -108,127 +113,127 @@ global irq13
 global irq14
 global irq15
 
-; 0: Divide By Zero Exception
+; 0: Divide by zero
 isr0:
 	cli
 	push byte 0
 	push byte 0
 	jmp isr_common_stub
 
-; 1: Debug Exception
+; 1: Debug
 isr1:
 	cli
 	push byte 0
 	push byte 1
 	jmp isr_common_stub
 
-; 2: Non Maskable Interrupt Exception
+; 2: Non-maskable interrupt
 isr2:
 	cli
 	push byte 0
 	push byte 2
 	jmp isr_common_stub
 
-; 3: Int 3 Exception
+; 3: Breakpoint
 isr3:
 	cli
 	push byte 0
 	push byte 3
 	jmp isr_common_stub
 
-; 4: INTO Exception
+; 4: Overflow (INTO)
 isr4:
 	cli
 	push byte 0
 	push byte 4
 	jmp isr_common_stub
 
-; 5: Out of Bounds Exception
+; 5: Out of bounds
 isr5:
 	cli
 	push byte 0
 	push byte 5
 	jmp isr_common_stub
 
-; 6: Invalid Opcode Exception
+; 6: Invalid opcode
 isr6:
 	cli
 	push byte 0
 	push byte 6
 	jmp isr_common_stub
 
-; 7: Coprocessor Not Available Exception
+; 7: Coprocessor not available
 isr7:
 	cli
 	push byte 0
 	push byte 7
 	jmp isr_common_stub
 
-; 8: Double Fault Exception (With Error Code!)
+; 8: Double fault exception (with error code)
 isr8:
 	cli
 	push byte 8
 	jmp isr_common_stub
 
-; 9: Coprocessor Segment Overrun Exception
+; 9: Coprocessor segment overrun
 isr9:
 	cli
 	push byte 0
 	push byte 9
 	jmp isr_common_stub
 
-; 10: Bad TSS Exception (With Error Code!)
+; 10: Bad TSS exception (with error code)
 isr10:
 	cli
 	push byte 10
 	jmp isr_common_stub
 
-; 11: Segment Not Present Exception (With Error Code!)
+; 11: Segment not present (with error code!)
 isr11:
 	cli
 	push byte 11
 	jmp isr_common_stub
 
-; 12: Stack Fault Exception (With Error Code!)
+; 12: Stack fault (with error code!)
 isr12:
 	cli
 	push byte 12
 	jmp isr_common_stub
 
-; 13: General Protection Fault Exception (With Error Code!)
+; 13: General protection fault (with error code!)
 isr13:
 	cli
 	push byte 13
 	jmp isr_common_stub
 
-; 14: Page Fault Exception (With Error Code!)
+; 14: Page fault (with error code!)
 isr14:
 	cli
 	push byte 14
 	jmp isr_common_stub
 
-; 15: Reserved Exception
+; 15: Reserved exception
 isr15:
 	cli
 	push byte 0
 	push byte 15
 	jmp isr_common_stub
 
-; 16: Floating Point Exception
+; 16: Floating point exception
 isr16:
 	cli
 	push byte 0
 	push byte 16
 	jmp isr_common_stub
 
-; 17: Alignment Check Exception
+; 17: Alignment check exception
 isr17:
 	cli
 	push byte 0
 	push byte 17
 	jmp isr_common_stub
 
-; 18: Machine Check Exception
+; 18: Machine check exception
 isr18:
 	cli
 	push byte 0
