@@ -75,35 +75,19 @@ void kernel_main()
 
 void user_input(char *input)
 {
-	if (strcmp(input, "DIE") == 0) {
-		kprint("Stopping the CPU\n");
-		asm volatile("hlt");
-	} else if (strcmp(input, "ATA RESET") == 0) {
-		kprint("ATA software is reset");
-		ata_init();
-	} else if (strcmp(input, "FS INIT") == 0) {
-		fs_init();
-	} else if (strcmp(input, "CLEAR") == 0) {
-		vga_init();
-	} else if (strcmp(input, "HELP") == 0) {
-		help();
-	} else {
-		kprint("Command not found.");
+	int found = 0;
+
+	for (u32 i = 0; i < __array_size(commands); ++i) {
+		struct command *e = &commands[i];
+
+		if (strcmp(input, e->cmd) == 0) {
+			found = 1;
+			e->routine();
+		}
 	}
 
-	// int found = 0;
-// 
-	// for (u32 i = 0; i < __array_size(commands); ++i) {
-		// struct command *e = &commands[i];
-// 
-		// if (strcmp(input, e->cmd) == 0) {
-			// found = 1;
-			// e->routine();
-		// }
-	// }
-// 
-	// if (!found)
-		// kprint("Command not found\n");
+	if (!found)
+		kprint("Command not found\n");
 
 	kprint("\n> ");
 }

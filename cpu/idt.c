@@ -1,7 +1,7 @@
 #include "idt.h"
 
-struct idt_gate idt[IDT_ENTRIES];
-struct idt_register idt_reg;
+static struct idt_gate idt[IDT_ENTRIES];
+static struct idt_register idt_reg;
 
 void idt_set_gate(int n, u32 handler)
 {
@@ -16,6 +16,5 @@ void idt_set()
 {
 	idt_reg.base = (u32) &idt;
 	idt_reg.limit = IDT_ENTRIES * sizeof(struct idt_gate) - 1;
-	/* Don't make the mistake of loading &idt -- always load &idt_reg */
 	__asm__ __volatile__("lidtl (%0)" : : "r" (&idt_reg));
 }
