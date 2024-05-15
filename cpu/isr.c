@@ -65,6 +65,7 @@ void isr_install()
 	idt_set_gate(30, (u32) isr30);
 	idt_set_gate(31, (u32) isr31);
 
+	/* https://pdos.csail.mit.edu/6.828/2010/readings/hardware/8259A.pdf */
 	port_byte_out(PIC1_COMMAND, ICW1_INIT | ICW1_ICW4);
 	port_byte_out(PIC2_COMMAND, ICW1_INIT | ICW1_ICW4);
 	port_byte_out(PIC1_DATA,    0x20);
