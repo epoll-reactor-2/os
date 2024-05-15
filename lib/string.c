@@ -31,7 +31,7 @@ void int_to_ascii(int n, char str[])
 		str[(digit_count - i)] = n % 10 + '0';
 		n /= 10;
 	}
-	str[digit_count + 1] = '\0';
+	str[digit_count] = '\0';
 }
 
 int strlen(char s[])
