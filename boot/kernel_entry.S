@@ -1,6 +1,17 @@
 global _start
 [bits 32]
 _start:
-	[extern kernel_main] ; Define calling point. Must have same name as kernel.c 'main' function
-	call kernel_main ; Calls the C function. The linker will know where it is placed in memory
-	jmp $
+	[extern kernel_main]
+	call kernel_main
+	; kernel_main() has no loops, so starting
+	; from this point of time, we are in the
+	; infinite loop that does nothing. The
+	; only way to handle OS is use interrupts
+	; (PS/2 devices, other) and exceptions.
+	;
+	; Notice, hlt instruction in this place is
+	; crucial and don't lets CPU use 100% of their
+	; resources for no reason.
+__wait_for_interrupt:
+	hlt
+	jmp __wait_for_interrupt

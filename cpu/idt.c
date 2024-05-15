@@ -1,5 +1,7 @@
 #include "idt.h"
 
+#define IDT_ENTRIES 256
+
 static struct idt_gate idt[IDT_ENTRIES];
 static struct idt_register idt_reg;
 
