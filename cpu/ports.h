@@ -1,5 +1,5 @@
-#ifndef KERNEL_PORTS_H
-#define KERNEL_PORTS_H
+#ifndef KERNEL_CPU_PORTS_H
+#define KERNEL_CPU_PORTS_H
 
 #include "type.h"
 
@@ -8,4 +8,4 @@ void port_byte_out(u16 port, u8 data);
 u16  port_word_in(u16 port);
 void port_word_out(u16 port, u16 data);
 
-#endif /* KERNEL_PORTS_H */
+#endif /* KERNEL_CPU_PORTS_H */

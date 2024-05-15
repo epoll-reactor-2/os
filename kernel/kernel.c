@@ -2,20 +2,65 @@
 #include "cpu/timer.h"
 #include "lib/string.h"
 #include "lib/mem.h"
+#include "kernel/compiler.h"
 #include "drivers/vga.h"
 #include "drivers/ata.h"
 #include "fs.h"
 
+static void cmd_die()
+{
+	kprint("Stopping the CPU\n");
+	asm volatile("hlt");
+}
+
+static void cmd_ata_reset()
+{
+	kprint("ATA software is reset");
+	ata_init();	
+}
+
+static void cmd_fs_init()
+{
+	fs_init();
+}
+
+static void cmd_clear()
+{
+	vga_init();
+}
+
+static void help();
+static void cmd_help()
+{
+	help();
+}
+
+struct command {
+	void	(*routine)();
+	char	cmd[64];
+	char	desc[64];
+};
+
+static struct command commands[] = {
+	{ cmd_die,		"DIE", 		"halt the CPU" 		},
+	{ cmd_ata_reset, 	"ATA RESET", 	"ATA reset" 		},
+	{ cmd_fs_init,		"FS INIT", 	"init filesystem"	},
+	{ cmd_clear,		"CLEAR", 	"clear screen" 		},
+	{ cmd_help,		"HELP", 	"print help" 		},
+};
+
 void help()
 {
-	kprint("Ready for input. Commands:\n"
-		"DIE       - to halt the CPU \n"
-		"ATA RESET - to do software reset on ATA Primary drive \n"
-		"FS INIT   - to init filesystem (Work in Progress!)\n"
-		"CLEAR     - clear screen\n"
-		"HELP      - print help\n"
-		"> "
-	);	
+	kprint("Ready for input. Commands:\n");
+
+	for (u32 i = 0; i < __array_size(commands); ++i) {
+		struct command *e = &commands[i];
+
+		kprint(e->cmd);
+		kprint(" - ");
+		kprint(e->desc);
+		kprint("\n");
+	}
 }
 
 void kernel_main()
@@ -45,5 +90,20 @@ void user_input(char *input)
 	} else {
 		kprint("Command not found.");
 	}
+
+	// int found = 0;
+// 
+	// for (u32 i = 0; i < __array_size(commands); ++i) {
+		// struct command *e = &commands[i];
+// 
+		// if (strcmp(input, e->cmd) == 0) {
+			// found = 1;
+			// e->routine();
+		// }
+	// }
+// 
+	// if (!found)
+		// kprint("Command not found\n");
+
 	kprint("\n> ");
 }

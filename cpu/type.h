@@ -1,5 +1,5 @@
-#ifndef KERNEL_TYPE_H
-#define KERNEL_TYPE_H
+#ifndef KERNEL_CPU_TYPE_H
+#define KERNEL_CPU_TYPE_H
 
 /* Instead of using 'chars' to allocate non-character bytes,
  * we will use these new type with no semantic meaning */
@@ -15,4 +15,4 @@ typedef          char  s8;
 
 #define NULL 0
 
-#endif /* KERNEL_TYPE_H */
+#endif /* KERNEL_CPU_TYPE_H */

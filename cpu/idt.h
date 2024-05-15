@@ -1,5 +1,5 @@
-#ifndef KERNEL_IDT_H
-#define KERNEL_IDT_H
+#ifndef KERNEL_CPU_IDT_H
+#define KERNEL_CPU_IDT_H
 
 #include "type.h"
 #include "kernel/compiler.h"
@@ -34,4 +34,4 @@ struct idt_register {
 void idt_set_gate(int n, u32 handler);
 void idt_set();
 
-#endif /* KERNEL_IDT_H */
+#endif /* KERNEL_CPU_IDT_H */

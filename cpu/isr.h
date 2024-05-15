@@ -1,5 +1,5 @@
-#ifndef KERNEL_ISR_H
-#define KERNEL_ISR_H
+#ifndef KERNEL_CPU_ISR_H
+#define KERNEL_CPU_ISR_H
 
 #include "type.h"
 
@@ -86,4 +86,4 @@ typedef void (*isr_t)(struct registers);
 void register_interrupt_handler(u8 n, isr_t handler);
 void irq_install();
 
-#endif /* KERNEL_ISR_H */
+#endif /* KERNEL_CPU_ISR_H */

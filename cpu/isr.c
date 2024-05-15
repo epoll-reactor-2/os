@@ -75,8 +75,7 @@ void isr_install()
 }
 
 /* To print the message which defines every exception */
-char *exception_messages[] =
-{
+static const char *exception_messages[] = {
 	"Division By Zero",
 	"Debug",
 	"Non Maskable Interrupt",
@@ -114,11 +113,15 @@ char *exception_messages[] =
 	"Reserved"
 };
 
+const char *__data = "Data";
+
 void isr_handler(struct registers r)
 {
 	kprint("received interrupt: ");
 	char s[10];
 	int_to_ascii(r.int_no, s);
+	kprint(s);
+	kprint(" ");
 	kprint(exception_messages[r.int_no]);
 	kprint("\n");
 }

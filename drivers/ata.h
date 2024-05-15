@@ -1,6 +1,6 @@
 // source of constants: https://wiki.osdev.org/IDE
-#ifndef KERNEL_ATA_H
-#define KERNEL_ATA_H
+#ifndef KERNEL_DRIVERS_ATA_H
+#define KERNEL_DRIVERS_ATA_H
 
 #include <stdint.h>
 #include "cpu/type.h"
@@ -56,4 +56,4 @@ u32  chs_to_lba(u32 cylinder, u32 head, u32 sector);
 u16* ata_read(u32 lba, u8 sector_num);
 u8   ata_write(u32 lba, u8 sector_num, u16* data, u8 size);
 
-#endif /* KERNEL_ATA_H */
+#endif /* KERNEL_DRIVERS_ATA_H */
