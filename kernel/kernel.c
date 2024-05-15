@@ -3,64 +3,14 @@
 #include "lib/string.h"
 #include "lib/mem.h"
 #include "kernel/compiler.h"
+#include "kernel/cmd.h"
 #include "drivers/vga.h"
 #include "drivers/ata.h"
 #include "fs.h"
 
-static void cmd_die()
+static void prompt()
 {
-	kprint("Stopping the CPU\n");
-	asm volatile("hlt");
-}
-
-static void cmd_ata_reset()
-{
-	kprint("ATA software is reset");
-	ata_init();	
-}
-
-static void cmd_fs_init()
-{
-	fs_init();
-}
-
-static void cmd_clear()
-{
-	vga_init();
-}
-
-static void help();
-static void cmd_help()
-{
-	help();
-}
-
-struct command {
-	void	(*routine)();
-	char	cmd[64];
-	char	desc[64];
-};
-
-static struct command commands[] = {
-	{ cmd_die,		"DIE", 		"halt the CPU" 		},
-	{ cmd_ata_reset, 	"ATA RESET", 	"ATA reset" 		},
-	{ cmd_fs_init,		"FS INIT", 	"init filesystem"	},
-	{ cmd_clear,		"CLEAR", 	"clear screen" 		},
-	{ cmd_help,		"HELP", 	"print help" 		},
-};
-
-void help()
-{
-	kprint("Ready for input. Commands:\n");
-
-	for (u32 i = 0; i < __array_size(commands); ++i) {
-		struct command *e = &commands[i];
-
-		kprint(e->cmd);
-		kprint(" - ");
-		kprint(e->desc);
-		kprint("\n");
-	}
+	kprint("\n> ");
 }
 
 void kernel_main()
@@ -70,15 +20,16 @@ void kernel_main()
 
 	vga_init();
 
-	help();
+	cmd_help();
+	prompt();
 }
 
 void user_input(char *input)
 {
 	int found = 0;
 
-	for (u32 i = 0; i < __array_size(commands); ++i) {
-		struct command *e = &commands[i];
+	for (u32 i = 0; i < __array_size(cmds); ++i) {
+		struct command *e = &cmds[i];
 
 		if (strcmp(input, e->cmd) == 0) {
 			found = 1;
@@ -89,5 +40,5 @@ void user_input(char *input)
 	if (!found)
 		kprint("Command not found\n");
 
-	kprint("\n> ");
+	prompt();
 }

@@ -27,8 +27,7 @@ static char key_buffer[256];
 
 static void keyboard_callback(__unused struct registers regs)
 {
-	/* The PIC leaves us the scancode in port 0x60 */
-	u8 scancode = port_byte_in(0x60);
+	u8 scancode = port_byte_in(PS2_PORT);
 
 	if (scancode > SC_MAX) return;
 
@@ -37,6 +36,8 @@ static void keyboard_callback(__unused struct registers regs)
 		kprint_backspace();
 	} else if (scancode == ENTER) {
 		kprint("\n");
+		/* TODO: Should this non-driver function be placed here?
+		         Maybe, invent some interface to report events. */
 		user_input(key_buffer);
 		key_buffer[0] = '\0';
 	} else {

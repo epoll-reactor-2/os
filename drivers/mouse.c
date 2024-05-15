@@ -7,7 +7,6 @@
 
 #define MOUSE_IRQ 	12
 
-#define MOUSE_PORT	0x60
 #define MOUSE_STATUS	0x64
 #define MOUSE_ABIT	0x02
 #define MOUSE_BBIT	0x01
@@ -40,34 +39,35 @@ static void mouse_wait(u8 a_type)
 static void mouse_write(u8 write)
 {
 	port_byte_out(MOUSE_STATUS, MOUSE_WRITE);
-	port_byte_out(MOUSE_PORT, write);
+	port_byte_out(PS2_PORT, write);
 }
 
 static u8 mouse_read()
 {
 	mouse_wait(0);
-	return port_byte_in(MOUSE_PORT);
+	return port_byte_in(PS2_PORT);
 }
 
 static void mouse_callback(__unused struct registers regs)
 {
 	kprint("Mouse trigger\n");
 
-	/* u8 scancode = */ port_byte_in(0x60);
+	/* u8 scancode = */ port_byte_in(PS2_PORT);
 }
 
 void mouse_init()
 {
+	/* TODO: What is this mean? */
 	mouse_wait(1);
 	port_byte_out(MOUSE_STATUS, 0xA8);
 	mouse_wait(1);
 	port_byte_out(MOUSE_STATUS, 0x20);
 	mouse_wait(0);
-	u8 status = port_byte_in(0x60) | 2;
+	u8 status = port_byte_in(PS2_PORT) | 2;
 	mouse_wait(1);
 	port_byte_out(MOUSE_STATUS, 0x60);
 	mouse_wait(1);
-	port_byte_out(MOUSE_PORT, status);
+	port_byte_out(PS2_PORT, status);
 	mouse_write(0xF6);
 	mouse_read();
 	mouse_write(0xF4);
