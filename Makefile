@@ -1,6 +1,5 @@
-C_SOURCES = $(wildcard kernel/*.c drivers/*.c cpu/*.c lib/*.c)
-# Nice syntax for file extension replacement
-OBJ = ${C_SOURCES:.c=.o cpu/interrupt.o}
+SRC = $(wildcard kernel/*.c drivers/*.c cpu/*.c lib/*.c)
+OBJ = $(SRC:.c=.o cpu/interrupt.o)
 
 # +----------+-----------------------+
 # | Arch     | i686-elf-*            |
@@ -20,7 +19,7 @@ LD_LABEL = "    LD "
 
 # First rule is run by default
 os-image.bin: boot/bootsect.bin kernel.bin
-	cat $^ > os-image.bin & qemu-img resize -f raw os-image.bin ${IMAGE_SIZE}
+	cat $^ > os-image.bin & qemu-img resize -f raw os-image.bin $(IMAGE_SIZE)
 
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
 # to 'strip' them manually on this case

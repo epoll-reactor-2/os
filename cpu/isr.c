@@ -4,6 +4,7 @@
 #include "timer.h"
 #include "lib/string.h"
 #include "drivers/keyboard.h"
+#include "drivers/mouse.h"
 #include "drivers/vga.h"
 
 #define PIC1		0x20		/* IO base address for master PIC */
@@ -184,4 +185,5 @@ void irq_install()
 	asm volatile("sti");
 	timer_init(50);
 	keyboard_init();
+	mouse_init();
 }
