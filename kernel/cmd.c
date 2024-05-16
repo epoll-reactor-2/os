@@ -5,29 +5,29 @@
 #include "drivers/ata.h"
 #include "drivers/vga.h"
 
-static void cmd_die()
+void cmd_die()
 {
 	kprint("Stopping the CPU\n");
 	asm volatile("hlt");
 }
 
-static void cmd_ata_reset()
+void cmd_ata_reset()
 {
 	kprint("ATA software is reset");
 	ata_init();	
 }
 
-static void cmd_fs_init()
+void cmd_fs_init()
 {
 	fs_init();
 }
 
-static void cmd_clear()
+void cmd_clear()
 {
 	vga_init();
 }
 
-/* public */ void cmd_help()
+void cmd_help()
 {
 	kprint("Ready for input. Commands:\n");
 

@@ -5,9 +5,9 @@ OBJ = $(SRC:.c=.o cpu/interrupt.o)
 # | Arch     | i686-elf-*            |
 # | Ubuntu   | i686-linux-gnu-*      |
 # +----------+-----------------------+
-CC = /usr/bin/i386-elf-gcc
-GDB = /usr/bin/i386-elf-gdb
-LD = /usr/bin/i386-elf-ld
+CC = gcc
+LD = gold
+GDB = gdb
 # -g: Use debugging symbols in gcc
 CFLAGS = -g -ffreestanding -Wall -Wextra -fno-exceptions -m32 -I.
 
@@ -17,6 +17,8 @@ AS_LABEL = "    AS "
 CC_LABEL = "    CC "
 LD_LABEL = "    LD "
 
+$(info CC: $(CC), LD: $(LD))
+
 # First rule is run by default
 os-image.bin: boot/bootsect.bin kernel.bin
 	cat $^ > os-image.bin & qemu-img resize -f raw os-image.bin $(IMAGE_SIZE)
@@ -24,7 +26,7 @@ os-image.bin: boot/bootsect.bin kernel.bin
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
 # to 'strip' them manually on this case
 kernel.bin: boot/kernel_entry.o $(OBJ)
-	@echo $(LD_LABEL) $<
+	@echo $(LD_LABEL) $@
 	@$(LD) -o $@ -Ttext 0x1000 $^ --oformat binary
 
 # Used for debugging purposes

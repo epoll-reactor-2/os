@@ -13,6 +13,10 @@ struct command {
 extern struct command cmds[5];
 
 /* Public command. Called manually. */
+void cmd_die();
+void cmd_ata_reset();
+void cmd_fs_init();
+void cmd_clear();
 void cmd_help();
 
 #endif /* KERNEL_CMD_H */
