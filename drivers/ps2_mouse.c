@@ -4,6 +4,7 @@
 #include "cpu/type.h"
 #include "cpu/ports.h"
 #include "kernel/compiler.h"
+#include "lib/string.h"
 
 enum {
 	MOUSE_STATUS	= 0x64,
@@ -68,10 +69,57 @@ static u8 mouse_read()
 	return port_byte_in(PS2_PORT);
 }
 
+__unused static int mouse_report_click(s8 bytes[3])
+{
+	if (bytes[0] & 0x80 || bytes[0] & 0x40) {
+		/* X/Y overflow. Bad packet. */
+		return -1;
+	}
+	if (bytes[0] & 0x01) {
+		kprint("Left click\n");
+	}
+	if (bytes[0] & 0x02) {
+		kprint("Right click\n");
+	}
+	if (bytes[0] & 0x04) {
+		kprint("Middle click\n");
+	}
+
+	return 0;
+}
+
+__unused static void mouse_report_coords(s8 bytes[3])
+{
+	/* TODO: Some usage of that. */
+	static int mouse_x = 0;
+	static int mouse_y = 0;
+	char buf[16];
+
+	/* Calculate x and y displacement */
+	s8 x_move = bytes[1];
+	s8 y_move = bytes[2];
+	if (bytes[0] & 0x10)
+		x_move |= 0xFFFFFF00;
+	if (bytes[0] & 0x20)
+		y_move |= 0xFFFFFF00;
+
+	/* Usually, Y movement is inverted. */
+	mouse_x += x_move;
+	mouse_y -= y_move;
+
+	kprint("coords: (");
+	int_to_ascii(mouse_x, buf);
+	kprint(buf);
+	kprint(", ");
+	int_to_ascii(mouse_y, buf);
+	kprint(buf);
+	kprint(")\n");
+}
+
 static void irq_mouse(__unused struct registers regs)
 {
 	static u8 cycle = 0;
-	static s8 bytes[3];
+	__unused static s8 bytes[3];
 
 	u8 status = port_byte_in(MOUSE_STATUS);
 	while (status & MOUSE_BBIT) {
@@ -90,20 +138,11 @@ static void irq_mouse(__unused struct registers regs)
 				break;
 			case 2:
 				bytes[2] = in;
-				/* We now have a full mouse packet ready to use */
-				if (bytes[0] & 0x80 || bytes[0] & 0x40) {
-					/* x/y overflow? bad packet! */
+				/* Report function can be easily reworked
+				   for any other need. */
+				if (mouse_report_click(bytes) != 0)
 					break;
-				}
-				if (bytes[0] & 0x01) {
-					kprint("Left click\n");
-				}
-				if (bytes[0] & 0x02) {
-					kprint("Right click\n");
-				}
-				if (bytes[0] & 0x04) {
-					kprint("Middle click\n");
-				}
+				mouse_report_coords(bytes);
 				cycle = 0;
 				break;
 			}
