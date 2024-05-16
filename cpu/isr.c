@@ -4,8 +4,8 @@
 #include "ports.h"
 #include "timer.h"
 #include "lib/string.h"
-#include "drivers/keyboard.h"
-#include "drivers/mouse.h"
+#include "drivers/ps2_keyboard.h"
+#include "drivers/ps2_mouse.h"
 #include "drivers/vga.h"
 
 enum {

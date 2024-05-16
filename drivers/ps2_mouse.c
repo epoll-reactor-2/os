@@ -1,11 +1,9 @@
-#include "drivers/mouse.h"
+#include "drivers/ps2_mouse.h"
 #include "drivers/vga.h"
 #include "cpu/isr.h"
 #include "cpu/type.h"
 #include "cpu/ports.h"
 #include "kernel/compiler.h"
-
-#define MOUSE_IRQ 	12
 
 enum {
 	MOUSE_STATUS	= 0x64,

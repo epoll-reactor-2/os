@@ -98,6 +98,7 @@ static s32 vga_put_char(char c, s32 col, s32 row, char attr)
 		off = vga_off(0, row + 1);
 		break;
 	case '\b':
+		off -= 2;
 		video_memory[off] = ' ';
 		video_memory[off + 1] = attr;
 		break;
@@ -129,38 +130,17 @@ static s32 vga_put_char(char c, s32 col, s32 row, char attr)
 	return off;
 }
 
-/* Print a message on the specified location
-   If col, row, are negative, we will use the current off */
-void kprint_at(const char *message, s32 col, s32 row)
+void kprint(const char *message)
 {
-	/* Set cursor if col/row are negative */
-	s32 off;
-	if (col >= 0 && row >= 0)
-		off = vga_off(col, row);
-	else {
-		off = vga_cursor_off();
-		row = vga_off_row(off);
-		col = vga_off_col(off);
-	}
+	s32 off = vga_cursor_off();
+	s32 row = vga_off_row(off);
+	s32 col = vga_off_col(off);
 
 	while (*message) {
 		off = vga_put_char(*message++, col, row, VGA_COLOR_DEFAULT);
 		row = vga_off_row(off);
 		col = vga_off_col(off);
 	}
-}
-
-void kprint(const char *message)
-{
-	kprint_at(message, -1, -1);
-}
-
-void kprint_backspace()
-{
-	s32 off = vga_cursor_off() - 2;
-	s32 row = vga_off_row(off);
-	s32 col = vga_off_col(off);
-	vga_put_char('\b', col, row, VGA_COLOR_DEFAULT);
 }
 
 void vga_init()

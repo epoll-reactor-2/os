@@ -1,11 +1,16 @@
-#include "keyboard.h"
-#include "vga.h"
+#include "drivers/ps2_keyboard.h"
+#include "drivers/vga.h"
 #include "cpu/ports.h"
 #include "cpu/isr.h"
 #include "cpu/timer.h"
 #include "lib/string.h"
 #include "kernel/compiler.h"
 #include "kernel/kernel.h"
+
+enum {
+	KEY_BACKSPACE	= 0x0E,
+	KEY_ENTER	= 0x1C
+};
 
 const char *sc_name[] = {
 	"ERROR",
@@ -26,30 +31,37 @@ const char sc_ascii[] = {
 	'?', '?', '?', ' '
 };
 
-static char key_buffer[256];
 
 static void irq_keyboard(__unused struct registers regs)
 {
-	u8 scancode = port_byte_in(PS2_PORT);
+	u8 code = port_byte_in(PS2_PORT);
+	static char key_buf[256];
 
-	if (scancode > SC_MAX) return;
+	if (code >= sizeof (sc_ascii))
+		return;
 
-	if (scancode == BACKSPACE) {
-		backspace(key_buffer);
-		kprint_backspace();
-	} else if (scancode == ENTER) {
-		kprint("\n");
+	switch (code) {
+	case KEY_BACKSPACE:
+		backspace(key_buf);
+		kprint("\b");
+		break;
+
+	case KEY_ENTER:
 		/* TODO: Should this non-driver function be placed here?
 		         Maybe, invent some interface to report events. */
-		user_input(key_buffer);
-		key_buffer[0] = '\0';
-	} else {
-		char letter = sc_ascii[(int)scancode];
-		/* Remember that kprint only accepts char[] */
-		char str[2] = {letter, '\0'};
-		append(key_buffer, letter);
-		kprint(str);
+		kprint("\n");
+		user_input(key_buf);
+		*key_buf = '\0';
+		break;
+
+	default: {
+		char sym = sc_ascii[(int) code];
+		char buf[2] = { sym, '\0' };
+		append(key_buf, sym);
+		kprint(buf);
+		break;
 	}
+	} /* switch */
 }
 
 void keyboard_install()
