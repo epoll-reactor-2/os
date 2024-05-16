@@ -85,7 +85,7 @@ void isr_install();
 void isr_handler(struct registers r);
 
 typedef void (*isr_t)(struct registers);
-void register_interrupt_handler(u8 n, isr_t handler);
+void irq_install_handler(u8 n, isr_t handler);
 void irq_install();
 
 #endif /* KERNEL_CPU_ISR_H */

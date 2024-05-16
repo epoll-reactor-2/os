@@ -73,5 +73,5 @@ void mouse_install()
 	mouse_write(0xF4);
 	mouse_read();
 
-	register_interrupt_handler(IRQ12, mouse_callback);
+	irq_install_handler(IRQ12, mouse_callback);
 }

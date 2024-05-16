@@ -160,7 +160,7 @@ void isr_handler(struct registers r)
 	kprint("\n");
 }
 
-void register_interrupt_handler(u8 n, isr_t handler)
+void irq_install_handler(u8 n, isr_t handler)
 {
 	interrupt_handlers[n] = handler;
 }
