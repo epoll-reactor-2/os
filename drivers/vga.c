@@ -6,7 +6,7 @@
 #define vga_color(fg, bg) (fg | bg << 4)
 
 /* Hardware text mode color constants. */
-enum vga_color {
+enum {
 	VGA_COLOR_BLACK		= 0,
 	VGA_COLOR_BLUE		= 1,
 	VGA_COLOR_GREEN		= 2,
@@ -26,15 +26,17 @@ enum vga_color {
 	VGA_COLOR_DEFAULT	= vga_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK)
 };
 
-enum vga_phys {
+enum {
 	VGA_PHYS_VIDEO_ADDR	= 0xB8000,
 	VGA_H			= 25,
-	VGA_W			= 80
+	VGA_W			= 80,
 };
 
 /* Screen i/o ports */
-#define REG_SCREEN_CTRL 0x3d4
-#define REG_SCREEN_DATA 0x3d5
+enum {
+	REG_SCREEN_CTRL 	= 0x3d4,
+	REG_SCREEN_DATA 	= 0x3d5,
+};
 
 static s32 vga_cursor_off()
 {

@@ -3,7 +3,9 @@
 
 #include "type.h"
 
-#define PS2_PORT	0x60
+enum {
+	PS2_PORT	= 0x60,
+};
 
 u8   port_byte_in(u16 port);
 void port_byte_out(u16 port, u8 data);
