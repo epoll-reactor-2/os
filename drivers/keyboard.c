@@ -28,7 +28,7 @@ const char sc_ascii[] = {
 
 static char key_buffer[256];
 
-static void keyboard_callback(__unused struct registers regs)
+static void irq_keyboard(__unused struct registers regs)
 {
 	u8 scancode = port_byte_in(PS2_PORT);
 
@@ -54,5 +54,5 @@ static void keyboard_callback(__unused struct registers regs)
 
 void keyboard_install()
 {
-	irq_install_handler(IRQ1, keyboard_callback);
+	irq_install_handler(IRQ1, irq_keyboard);
 }
