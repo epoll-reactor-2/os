@@ -155,7 +155,9 @@ static void irq_mouse(__unused struct registers regs)
 
 void mouse_install()
 {
-	/* TODO: What is this mean? */
+	/* NOTE: For totally unknown for me reason HDMI port and
+	         my USB mouse are interconnected somehow. This mouse
+	         handler works iff HDMI is plugged out from laptop. */
 	mouse_wait(1);
 	port_byte_out(MOUSE_STATUS, 0xA8);
 	mouse_wait(1);
