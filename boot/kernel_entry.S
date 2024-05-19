@@ -2,7 +2,8 @@ global _start
 [bits 32]
 _start:
 	[extern kernel_main]
-	call kernel_main
+	call	kernel_main
+
 	; kernel_main() has no loops, so starting
 	; from this point of time, we are in the
 	; infinite loop that does nothing. The
@@ -14,4 +15,4 @@ _start:
 	; resources for no reason.
 __wait_for_interrupt:
 	hlt
-	jmp __wait_for_interrupt
+	jmp	__wait_for_interrupt
