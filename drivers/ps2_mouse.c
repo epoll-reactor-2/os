@@ -1,9 +1,9 @@
 #include "drivers/ps2_mouse.h"
-#include "drivers/vga.h"
 #include "cpu/isr.h"
 #include "cpu/type.h"
 #include "cpu/ports.h"
 #include "kernel/compiler.h"
+#include "lib/stdio.h"
 #include "lib/string.h"
 
 enum {
@@ -93,7 +93,6 @@ __unused static void mouse_report_coords(s8 bytes[3])
 	/* TODO: Some usage of that. */
 	static int mouse_x = 0;
 	static int mouse_y = 0;
-	char buf[16];
 
 	/* Calculate x and y displacement */
 	s8 x_move = bytes[1];
@@ -107,13 +106,7 @@ __unused static void mouse_report_coords(s8 bytes[3])
 	mouse_x += x_move;
 	mouse_y -= y_move;
 
-	kprint("coords: (");
-	int_to_ascii(mouse_x, buf);
-	kprint(buf);
-	kprint(", ");
-	int_to_ascii(mouse_y, buf);
-	kprint(buf);
-	kprint(")\n");
+	kprintf("coords: (%d, %d)\n", mouse_x, mouse_y);
 }
 
 static void irq_mouse(__unused struct registers regs)

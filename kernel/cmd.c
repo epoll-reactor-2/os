@@ -4,6 +4,7 @@
 #include "cpu/type.h"
 #include "drivers/ata.h"
 #include "drivers/vga.h"
+#include "lib/stdio.h"
 
 void cmd_die()
 {
@@ -34,10 +35,7 @@ void cmd_help()
 	for (u32 i = 0; i < __array_size(cmds); ++i) {
 		const struct command *e = &cmds[i];
 
-		kprint(e->cmd);
-		kprint(" - ");
-		kprint(e->desc);
-		kprint("\n");
+		kprintf("%s - %s\n", e->cmd, e->desc, "Abc");
 	}
 }
 

@@ -1,12 +1,13 @@
-#ifndef STRINGS_H
-#define STRINGS_H
+#ifndef KERNEL_LIB_STRING_H
+#define KERNEL_LIB_STRING_H
 
-void int_to_ascii(int n, char str[]);
-void hex_to_ascii(int n, char str[]);
-int strlen(char s[]);
-void strcopy(char *dst, char *src);
+#include "cpu/type.h"
+
+size_t strlen(char s[]);
+char *strcat(char *dst, const char* src);
+void strcpy(char *dst, char *src);
 void backspace(char s[]);
 void append(char s[], char n);
-int strcmp(char *s1, char *s2);
+size_t strcmp(char *s1, char *s2);
 
-#endif
+#endif /* KERNEL_LIB_STRING_H */

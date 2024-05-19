@@ -2,22 +2,20 @@
 #include "ports.h"
 #include "isr.h"
 #include "kernel/compiler.h"
-#include "drivers/vga.h"
+#include "lib/stdio.h"
 #include "lib/string.h"
 
 static u32 tick = 0;
 
 __unused static void kprint_ticks()
 {
-	char tick_ascii[256];
-	int_to_ascii(tick, tick_ascii);
-	kprint(tick_ascii);
-	kprint("\n");
+	kprintf("%d\n", tick);
 }
 
 static void timer_callback(__unused struct registers regs)
 {
 	tick++;
+	// kprint_ticks();
 }
 
 void timer_init(u32 freq)

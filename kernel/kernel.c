@@ -1,12 +1,12 @@
 #include "cpu/isr.h"
 #include "cpu/timer.h"
+#include "drivers/ata.h"
+#include "drivers/vga.h"
 #include "lib/string.h"
 #include "lib/mem.h"
+#include "lib/stdio.h"
 #include "kernel/compiler.h"
 #include "kernel/cmd.h"
-#include "drivers/vga.h"
-#include "drivers/ata.h"
-#include "fs.h"
 
 static void prompt()
 {

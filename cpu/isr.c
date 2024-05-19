@@ -3,10 +3,10 @@
 #include "idt.h"
 #include "ports.h"
 #include "timer.h"
+#include "lib/stdio.h"
 #include "lib/string.h"
 #include "drivers/ps2_keyboard.h"
 #include "drivers/ps2_mouse.h"
-#include "drivers/vga.h"
 
 enum {
 	PIC1		= 0x20,		/* IO base address for master PIC */
@@ -157,13 +157,7 @@ const char *__data = "Data";
 
 void isr_handler(struct registers r)
 {
-	kprint("received interrupt: ");
-	char s[10];
-	int_to_ascii(r.int_no, s);
-	kprint(s);
-	kprint(" ");
-	kprint(exception_messages[r.int_no]);
-	kprint("\n");
+	kprintf("received interrupt: %d, %s\n", r.int_no, exception_messages[r.int_no]);
 }
 
 void irq_install_handler(u8 n, isr_t handler)

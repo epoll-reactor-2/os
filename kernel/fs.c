@@ -1,7 +1,7 @@
 #include "fs.h"
 #include "drivers/ata.h"
-#include "drivers/vga.h"
 #include "lib/mem.h"
+#include "lib/stdio.h"
 #include "lib/string.h"
 
 void fs_init()
@@ -17,10 +17,6 @@ void fs_init()
 	u16 *tmp = ata_read(t, 1);
 
 	for (int i = 0; i < 16; i++) {
-		char str[6];
-		hex_to_ascii(tmp[i], str);
-		kprint(str);
-		kprint("\n");
-		free(str);
+		kprintf("%x\n", tmp[i]);
 	}
 }

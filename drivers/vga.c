@@ -84,7 +84,7 @@ static s32 vga_off_col(s32 off)
    Sets the video cursor to the returned off */
 static s32 vga_put_char(char c, s32 col, s32 row, char attr)
 {
-	u8 *video_memory = (u8*) VGA_PHYS_VIDEO_ADDR;
+	u8 *video_memory = (u8 *) VGA_PHYS_VIDEO_ADDR;
 
 	s32 off;
 	if (col >= 0 && row >= 0)
@@ -130,14 +130,19 @@ static s32 vga_put_char(char c, s32 col, s32 row, char attr)
 	return off;
 }
 
-void kprint(const char *message)
+void vga_put_byte(char c)
+{
+	vga_put_string(&c);
+}
+
+void vga_put_string(const char *mem)
 {
 	s32 off = vga_cursor_off();
 	s32 row = vga_off_row(off);
 	s32 col = vga_off_col(off);
 
-	while (*message) {
-		off = vga_put_char(*message++, col, row, VGA_COLOR_DEFAULT);
+	while (*mem) {
+		off = vga_put_char(*mem++, col, row, VGA_COLOR_DEFAULT);
 		row = vga_off_row(off);
 		col = vga_off_col(off);
 	}

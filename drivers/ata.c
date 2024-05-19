@@ -1,7 +1,7 @@
 #include "ata.h"
 #include "cpu/type.h"
 #include "cpu/ports.h"
-#include "drivers/vga.h"
+#include "lib/stdio.h"
 #include "lib/string.h"
 #include "lib/mem.h"
 
