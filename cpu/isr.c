@@ -9,29 +9,31 @@
 #include "drivers/ps2_mouse.h"
 
 enum {
-	PIC1		= 0x20,		/* IO base address for master PIC */
-	PIC2		= 0xA0,		/* IO base address for slave PIC */
+	PIC1		= 0x20,		/* IO base address for master PIC. */
+	PIC2		= 0xA0,		/* IO base address for slave PIC. */
 	PIC1_COMMAND	= PIC1,
 	PIC1_DATA	= PIC1 + 1,
 	PIC2_COMMAND	= PIC2,
 	PIC2_DATA	= PIC2 + 1,
+
+	PIC_EOI		= 0x20,		/* End of interrupt. */
 };
 
 enum {
 /* ICW - Initialization command word. */
-	ICW1_ICW4	= 0x01,		/* Indicates that ICW4 will be present */
-	ICW1_SINGLE	= 0x02,		/* Single (cascade) mode */
-	ICW1_INTERVAL4	= 0x04,		/* Call address interval 4 (8) */
-	ICW1_LEVEL	= 0x08,		/* Level triggered (edge) mode */
+	ICW1_ICW4	= 0x01,		/* Indicates that ICW4 will be present. */
+	ICW1_SINGLE	= 0x02,		/* Single (cascade) mode. */
+	ICW1_INTERVAL4	= 0x04,		/* Call address interval 4 (8). */
+	ICW1_LEVEL	= 0x08,		/* Level triggered (edge) mode. */
 	ICW1_INIT	= 0x10,		/* Initialization - required! */
 };
 
 enum {
-	ICW4_8086	= 0x01,		/* 8086/88 (MCS-80/85) mode */
-	ICW4_AUTO	= 0x02,		/* Auto (normal) EOI */
-	ICW4_BUF_SLAVE	= 0x08,		/* Buffered mode/slave */
-	ICW4_BUF_MASTER	= 0x0C,		/* Buffered mode/master */
-	ICW4_SFNM	= 0x10,		/* Special fully nested (not) */
+	ICW4_8086	= 0x01,		/* 8086/88 (MCS-80/85) mode. */
+	ICW4_AUTO	= 0x02,		/* Auto (normal) EOI. */
+	ICW4_BUF_SLAVE	= 0x08,		/* Buffered mode/slave. */
+	ICW4_BUF_MASTER	= 0x0C,		/* Buffered mode/master. */
+	ICW4_SFNM	= 0x10,		/* Special fully nested (not). */
 };
 
 isr_t interrupt_handlers[256];
@@ -166,20 +168,23 @@ void irq_install_handler(u8 n, isr_t handler)
 }
 
 /* NOTE: This function periodically called to handle
-         IRQ0 - timer interrupt. */
+         IRQ0 - timer interrupt.
+
+   NOTE: This function is called when hardware/software
+         interrupt is triggered. In responce, we send
+         ack */
 void irq_handler(struct registers r)
 {
 	/* After every interrupt we need to send an EOI to the PICs
 	* or they will not send another interrupt again */
-	if (r.int_no >= 40)
-		port_byte_out(0xA0, 0x20); /* slave */
-	port_byte_out(0x20, 0x20); /* master */
 
 	/* Handle the interrupt in a more modular way */
 	if (interrupt_handlers[r.int_no] != 0) {
 		isr_t handler = interrupt_handlers[r.int_no];
 		handler(r);
 	}
+
+	irq_eoi(r.int_no);
 }
 
 void irq_install()
@@ -190,4 +195,11 @@ void irq_install()
 	timer_init(50);
 	keyboard_install();
 	mouse_install();
+}
+
+void irq_eoi(u32 int_no)
+{
+	if (int_no >= 40)
+		port_byte_out(PIC2, PIC_EOI); /* Slave. */
+	port_byte_out(PIC1, PIC_EOI); /* Master. */
 }

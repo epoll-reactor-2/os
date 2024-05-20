@@ -90,4 +90,10 @@ typedef void (*isr_t)(struct registers);
 void irq_install_handler(u8 n, isr_t handler);
 void irq_install();
 
+/* Notify PIC controller that interrupt processing is finished.
+
+   NOTE: It just tells the PIC that we are ready
+         to receive more IRQ's. */
+void irq_eoi(u32 int_no);
+
 #endif /* KERNEL_CPU_ISR_H */

@@ -109,10 +109,10 @@ __unused static void mouse_report_coords(s8 bytes[3])
 	kprintf("coords: (%d, %d)\n", mouse_x, mouse_y);
 }
 
-static void irq_mouse(__unused struct registers regs)
+static void irq_mouse(__unused struct registers r)
 {
 	static u8 cycle = 0;
-	__unused static s8 bytes[3];
+	static s8 bytes[3];
 
 	u8 status = port_byte_in(MOUSE_STATUS);
 	while (status & MOUSE_BBIT) {
@@ -143,7 +143,7 @@ static void irq_mouse(__unused struct registers regs)
 		status = port_byte_in(MOUSE_STATUS);
 	}
 
-	/* TODO: Learn what is acknowledge in context of PS/2. */
+	irq_eoi(IRQ12);
 }
 
 void mouse_install()

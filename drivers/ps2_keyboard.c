@@ -62,6 +62,8 @@ static void irq_keyboard(__unused struct registers regs)
 		break;
 	}
 	} /* switch */
+
+	irq_eoi(IRQ1);
 }
 
 void keyboard_install()
