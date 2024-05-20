@@ -91,8 +91,10 @@ __really_inline static void scroll_if_needed(s32 *off)
 
 	/* Blank last line. */
 	u8 *last_line = (u8 *) VGA_PHYS_VIDEO_ADDR + vga_off(0, VGA_H - 1);
-	for (s32 i = 0; i < VGA_W * 2; i++)
-		last_line[i] = 0;
+	for (s32 i = 0; i < VGA_W; i++) {
+		last_line[i * 2] = ' ';
+		last_line[i * 2 + 1] = VGA_COLOR_DEFAULT;
+	}
 
 	*off -= 2 * VGA_W;
 }

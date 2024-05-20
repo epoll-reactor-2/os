@@ -18,7 +18,7 @@ void kernel_main()
 	isr_install();
 	irq_install();
 
-	// vga_init();
+	vga_init();
 
 	cmd_help();
 	prompt();
