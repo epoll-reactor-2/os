@@ -1,6 +1,7 @@
 #include "vga.h"
 #include "cpu/ports.h"
 #include "cpu/type.h"
+#include "kernel/compiler.h"
 #include "lib/mem.h"
 
 #define vga_color(fg, bg) (fg | bg << 4)
@@ -65,14 +66,35 @@ static s32 vga_off(s32 col, s32 row)
 	return 2 * (row * VGA_W + col);
 }
 
-static s32 vga_off_row(s32 off)
+__unused static s32 vga_off_row(s32 off)
 {
 	return off / (2 * VGA_W);
 }
 
-static s32 vga_off_col(s32 off)
+__unused static s32 vga_off_col(s32 off)
 {
 	return (off - (vga_off_row(off) * 2 * VGA_W)) / 2;
+}
+
+__really_inline static void scroll_if_needed(s32 *off)
+{
+	/* Check if the off is over screen size and scroll. */
+	if (*off < VGA_H * VGA_W * 2)
+		return;
+
+	for (s32 i = 1; i < VGA_H; i++)
+		memcpy(
+			(u8 *) (VGA_PHYS_VIDEO_ADDR + vga_off(0, i    )),
+			(u8 *) (VGA_PHYS_VIDEO_ADDR + vga_off(0, i - 1)),
+			VGA_W * 2
+		);
+
+	/* Blank last line. */
+	u8 *last_line = (u8 *) VGA_PHYS_VIDEO_ADDR + vga_off(0, VGA_H - 1);
+	for (s32 i = 0; i < VGA_W * 2; i++)
+		last_line[i] = 0;
+
+	*off -= 2 * VGA_W;
 }
 
 /* Declaration of private functions */
@@ -82,15 +104,12 @@ static s32 vga_off_col(s32 off)
    If 'attr' is zero it will use 'white on black' as default
    Returns the off of the next character
    Sets the video cursor to the returned off */
-static s32 vga_put_char(char c, s32 col, s32 row, char attr)
+static s32 vga_put_char(char c)
 {
 	u8 *video_memory = (u8 *) VGA_PHYS_VIDEO_ADDR;
-
-	s32 off;
-	if (col >= 0 && row >= 0)
-		off = vga_off(col, row);
-	else
-		off = vga_cursor_off();
+	char attr = VGA_COLOR_DEFAULT;
+	s32 off = vga_cursor_off();
+	s32 row = 0;
 
 	switch (c) {
 	case '\n':
@@ -109,54 +128,32 @@ static s32 vga_put_char(char c, s32 col, s32 row, char attr)
 		break;
 	}
 
-	/* Check if the off is over screen size and scroll */
-	if (off >= VGA_H * VGA_W * 2) {
-		for (s32 i = 1; i < VGA_H; i++)
-			memcpy(
-				(u8*) (vga_off(0, i    ) + VGA_PHYS_VIDEO_ADDR),
-				(u8*) (vga_off(0, i - 1) + VGA_PHYS_VIDEO_ADDR),
-				VGA_W * 2
-			);
-
-		/* Blank last line */
-		char *last_line = (char*) (vga_off(0, VGA_H - 1) + (u8*) VGA_PHYS_VIDEO_ADDR);
-		for (s32 i = 0; i < VGA_W * 2; i++)
-			last_line[i] = 0;
-
-		off -= 2 * VGA_W;
-	}
-
+	scroll_if_needed(&off);
 	vga_set_cursor_off(off);
 	return off;
 }
 
 void vga_put_byte(char c)
 {
-	vga_put_string(&c);
+	vga_put_string((char[]) { c, '\0' });
 }
 
 void vga_put_string(const char *mem)
 {
-	s32 off = vga_cursor_off();
-	s32 row = vga_off_row(off);
-	s32 col = vga_off_col(off);
-
-	while (*mem) {
-		off = vga_put_char(*mem++, col, row, VGA_COLOR_DEFAULT);
-		row = vga_off_row(off);
-		col = vga_off_col(off);
-	}
+	while (*mem)
+		vga_put_char(*mem++);
 }
 
 void vga_init()
 {
 	s32 screen_size = VGA_W * VGA_H;
 	s32 i;
-	u8 *screen = (u8*) VGA_PHYS_VIDEO_ADDR;
+	u8 *video_memory = (u8 *) VGA_PHYS_VIDEO_ADDR;
 
 	for (i = 0; i < screen_size; i++) {
-		screen[i * 2] = ' ';
-		screen[i * 2 + 1] = VGA_COLOR_DEFAULT;
+		video_memory[i * 2] = ' ';
+		video_memory[i * 2 + 1] = VGA_COLOR_DEFAULT;
 	}
+
 	vga_set_cursor_off(vga_off(0, 0));
 }
