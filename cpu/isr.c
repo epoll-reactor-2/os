@@ -155,8 +155,6 @@ static const char *exception_messages[] = {
 	"Reserved"
 };
 
-const char *__data = "Data";
-
 void isr_handler(struct registers r)
 {
 	kprintf("received interrupt: %d, %s\n", r.int_no, exception_messages[r.int_no]);
