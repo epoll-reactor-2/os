@@ -10,3 +10,21 @@
    in ~/.zshrc:
    export MICRO_CONFIG_HOME=.config/micro
    Then micro will search local directory for config.
+
+4) VESA graphics
+
+   Preconditions:
+   1) Configuration that will allow to switch between
+      VGA and VESA modes.
+
+      Ways to do:
+      1) header file with macro CONFIG_*
+      2) menuconfig (wow)
+         https://github.com/JiauZhang/menuconfig
+
+   Resources:
+   1) Tutorial
+      https://wiki.osdev.org/User:Omarrx024/VESA_Tutorial
+
+   2) BIOS 0x10 interrupt
+      https://en.wikipedia.org/wiki/INT_10H#List_of_supported_functions

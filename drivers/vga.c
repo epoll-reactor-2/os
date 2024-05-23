@@ -78,7 +78,6 @@ __unused static s32 vga_off_col(s32 off)
 
 __really_inline static void scroll_if_needed(s32 *off)
 {
-	/* Check if the off is over screen size and scroll. */
 	if (*off < VGA_H * VGA_W * 2)
 		return;
 
