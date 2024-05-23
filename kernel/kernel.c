@@ -34,8 +34,6 @@ void user_input(char *input)
 		cmd_die();
 	} else if (!strcmp(input, "ATA RESET")) {
 		cmd_ata_reset();
-	} else if (!strcmp(input, "FS INIT")) {
-		cmd_fs_init();
 	} else if (!strcmp(input, "CLEAR")) {
 		cmd_clear();
 	} else if (!strcmp(input, "HELP")) {

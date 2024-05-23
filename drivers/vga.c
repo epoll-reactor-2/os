@@ -84,8 +84,8 @@ __really_inline static void scroll_if_needed(s32 *off)
 
 	for (s32 i = 1; i < VGA_H; i++)
 		memcpy(
-			(u8 *) (VGA_PHYS_VIDEO_ADDR + vga_off(0, i    )),
 			(u8 *) (VGA_PHYS_VIDEO_ADDR + vga_off(0, i - 1)),
+			(u8 *) (VGA_PHYS_VIDEO_ADDR + vga_off(0, i    )),
 			VGA_W * 2
 		);
 

@@ -3,9 +3,7 @@
 
 #include "cpu/type.h"
 
-void memcpy(u8 *source, u8 *dest, int nbytes);
-void memset(void *dest, u8 val, u32 len);
-void free(void *addr);
-u32 kmalloc(u32 size);
+void *memcpy(void *__dst, const void *__src, size_t n);
+void *memset(void *s, s32 c, size_t n);
 
 #endif /* KERNEL_LIB_MEM_H */

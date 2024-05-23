@@ -1,6 +1,5 @@
 #include "kernel/cmd.h"
 #include "kernel/compiler.h"
-#include "kernel/fs.h"
 #include "cpu/type.h"
 #include "drivers/ata.h"
 #include "drivers/vga.h"
@@ -16,11 +15,6 @@ void cmd_ata_reset()
 {
 	kprint("ATA software is reset");
 	ata_init();	
-}
-
-void cmd_fs_init()
-{
-	fs_init();
 }
 
 void cmd_clear()
@@ -42,7 +36,6 @@ void cmd_help()
 struct command cmds[] = {
 	{ cmd_die,		"DIE", 		"halt the CPU" 		},
 	{ cmd_ata_reset, 	"ATA RESET", 	"ATA reset" 		},
-	{ cmd_fs_init,		"FS INIT", 	"init filesystem"	},
 	{ cmd_clear,		"CLEAR", 	"clear screen" 		},
 	{ cmd_help,		"HELP", 	"print help" 		},
 };

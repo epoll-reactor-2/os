@@ -55,7 +55,9 @@ enum {
 
 void ata_init();
 u32  chs_to_lba(u32 cylinder, u32 head, u32 sector);
-u16* ata_read(u32 lba, u8 sector_num);
+/*
+u16 *ata_read(u32 lba, u8 sector_num);
+*/
 u8   ata_write(u32 lba, u8 sector_num, u16* data, u8 size);
 
 #endif /* KERNEL_DRIVERS_ATA_H */

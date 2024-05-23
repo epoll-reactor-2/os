@@ -64,6 +64,7 @@ int ata_poll()
 	return 0;
 }
 
+/*
 u16* ata_read(u32 lba, u8 sector_num)
 {
 	port_byte_out(ATA_PRIMARY_IO + ATA_REG_HDDEVSEL, 0xE0 | (u8) (0x00 << 4) | (u8) ((lba >> 24) & 0x0F));
@@ -82,7 +83,7 @@ u16* ata_read(u32 lba, u8 sector_num)
 	}
 	return data;
 }
-
+*/
 u8 ata_write(u32 lba, u8 sector_num, u16* data, u8 size)
 {
 	port_byte_out(ATA_PRIMARY_IO + ATA_REG_HDDEVSEL, 0xE0 | (u8) (0x00 << 4) | (u8) ((lba >> 24) & 0x0F));
