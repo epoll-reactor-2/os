@@ -12,7 +12,7 @@ __unused static void kprint_ticks()
 	kprintf("%d\n", tick);
 }
 
-static void timer_callback(__unused struct registers regs)
+static void timer_callback(__unused struct stack_frame frame)
 {
 	tick++;
 	// kprint_ticks();

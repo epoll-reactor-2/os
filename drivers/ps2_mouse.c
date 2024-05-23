@@ -109,7 +109,7 @@ __unused static void mouse_report_coords(s8 bytes[3])
 	kprintf("coords: (%d, %d)\n", mouse_x, mouse_y);
 }
 
-static void irq_mouse(__unused struct registers r)
+static void irq_mouse(__unused struct stack_frame frame)
 {
 	static u8 cycle = 0;
 	static s8 bytes[3];

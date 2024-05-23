@@ -32,7 +32,7 @@ const char sc_ascii[] = {
 };
 
 
-static void irq_keyboard(__unused struct registers regs)
+static void irq_keyboard(__unused struct stack_frame frame)
 {
 	u8 code = port_byte_in(PS2_PORT);
 	static char key_buf[256];

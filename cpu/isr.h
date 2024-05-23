@@ -76,7 +76,7 @@ enum {
 /* Struct which aggregates many registers
    TODO: Where this structure and order of registers
          is specified? */
-struct registers {
+struct stack_frame {
 	u32 ds; /* Data segment selector */
 	u32 edi, esi, ebp, esp, ebx, edx, ecx, eax; /* Pushed by pusha. */
 	u32 int_no, err_code; /* Interrupt number and error code (if applicable) */
@@ -84,9 +84,9 @@ struct registers {
 };
 
 void isr_install();
-void isr_handler(struct registers r);
+void isr_handler(struct stack_frame frame);
 
-typedef void (*isr_t)(struct registers);
+typedef void (*isr_t)(struct stack_frame);
 void irq_install_handler(u8 n, isr_t handler);
 void irq_install();
 

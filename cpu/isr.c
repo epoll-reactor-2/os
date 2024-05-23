@@ -155,9 +155,11 @@ static const char *exception_messages[] = {
 	"Reserved"
 };
 
-void isr_handler(struct registers r)
+void isr_handler(struct stack_frame frame)
 {
-	kprintf("received interrupt: %d, %s\n", r.int_no, exception_messages[r.int_no]);
+	u32 int_no = frame.int_no;
+
+	kprintf("received interrupt: %d, %s\n", int_no, exception_messages[int_no]);
 }
 
 void irq_install_handler(u8 n, isr_t handler)
@@ -171,18 +173,20 @@ void irq_install_handler(u8 n, isr_t handler)
    NOTE: This function is called when hardware/software
          interrupt is triggered. In responce, we send
          ack */
-void irq_handler(struct registers r)
+void irq_handler(struct stack_frame frame)
 {
 	/* After every interrupt we need to send an EOI to the PICs
 	* or they will not send another interrupt again */
 
 	/* Handle the interrupt in a more modular way */
-	if (interrupt_handlers[r.int_no] != 0) {
-		isr_t handler = interrupt_handlers[r.int_no];
-		handler(r);
+	u32 int_no = frame.int_no;
+
+	if (interrupt_handlers[int_no] != 0) {
+		isr_t handler = interrupt_handlers[int_no];
+		handler(frame);
 	}
 
-	irq_eoi(r.int_no);
+	irq_eoi(int_no);
 }
 
 void irq_install()
