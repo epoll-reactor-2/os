@@ -34,7 +34,7 @@ const char sc_ascii[] = {
 
 static void irq_keyboard(__unused struct stack_frame frame)
 {
-	u8 code = port_byte_in(PS2_PORT);
+	u8 code = port_byte_in(PORT_PS2);
 	static char key_buf[256];
 
 	if (code >= sizeof (sc_ascii))

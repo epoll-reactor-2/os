@@ -4,7 +4,12 @@
 #include "type.h"
 
 enum {
-	PS2_PORT	= 0x60,
+	PORT_PS2			= 0x060,
+
+	PORT_ATA_PRIMARY_IO		= 0x1F0,
+	PORT_ATA_SECONDARY_IO		= 0x170,
+	PORT_ATA_PRIMARY_DEVCTL		= 0x3F6,
+	PORT_ATA_SECONDARY_DEVCTL	= 0x376,
 };
 
 u8   port_byte_in(u16 port);

@@ -6,12 +6,6 @@
 #include "cpu/type.h"
 
 enum {
-	ATA_PRIMARY_IO 			= 0x1F0,
-	ATA_SECONDARY_IO 		= 0x170,
-
-	ATA_PRIMARY_DEVCTL 		= 0x3F6,
-	ATA_SECONDARY_DEVCTL	 	= 0x376,
-
 	/* Status port masks. */
 	ATA_SR_BSY     			= 0x80,    /* Busy */
 	ATA_SR_DRDY    			= 0x40,    /* Drive ready */
