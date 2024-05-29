@@ -8,7 +8,7 @@
 void cmd_die()
 {
 	kprint("Stopping the CPU\n");
-	asm volatile("hlt");
+	__asm__ __volatile__ ("hlt");
 }
 
 void cmd_ata_reset()

@@ -193,7 +193,7 @@ void irq_install()
 {
 	/* Set the interrupt flag (IF) in the EFLAGS register.
 	   Or simply "enable interrupts". */
-	asm volatile("sti");
+	__asm__ __volatile__ ("sti");
 	timer_init(50);
 	keyboard_install();
 	mouse_install();
