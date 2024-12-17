@@ -4,6 +4,9 @@
 #include <stddef.h>
 #include "../plic/trap_frame.h"
 
+#define __syscall_exit		0
+#define __syscall_test		1
+
 // Defined in src/asm/crt0.s
 size_t make_syscall(size_t);
 

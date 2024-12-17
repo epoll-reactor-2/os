@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include "trap_handler.h"
-#include "../uart/uart.h"
+#include "../printk/printk.h"
 #include "../common/common.h"
 #include "cpu.h"
 #include "plic.h"
@@ -34,7 +34,7 @@ size_t m_mode_trap_handler(size_t epc, size_t tval, size_t cause, size_t hart,
 			__assert(process != NULL,
 				"m_mode_trap_handler(): unexpected got NULL when attempting to schedule next process\n");
 
-			kprintf("Context switch: scheduling next process with PID = %d\n",
+			printk("Context switch: scheduling next process with PID = %d\n",
 				process->pid);
 
 			switch_to_user((size_t)process->frame, process->pc,
@@ -92,13 +92,13 @@ size_t m_mode_trap_handler(size_t epc, size_t tval, size_t cause, size_t hart,
 
 		case 13:
 			// Load page fault
-			kprintf("Load page fault: attempted to dereference address %p\n", tval);
+			printk("Load page fault: attempted to dereference address %p\n", tval);
 			return_pc += 4;
 			break;
 
 		case 15:
 			// Store/AMO page fault
-			kprintf("Store/AMO page fault: attempted to dereference address %p\n",
+			printk("Store/AMO page fault: attempted to dereference address %p\n",
 				tval);
 
 			return_pc += 4;

@@ -3,8 +3,8 @@ CC=riscv64-unknown-elf-gcc
 CFLAGS=-ffreestanding -nostartfiles -nostdlib -nodefaultlibs
 CFLAGS+=-g -Wl,--gc-sections -mcmodel=medany -march=rv64g
 #CFLAGS+=-Wl,--no-warn-rwx-segments
-RUNTIME=src/asm/crt0.S
-LINKER_SCRIPT=src/lds/riscv64-virt.ld
+RUNTIME=kernel/asm/crt0.S
+LINKER_SCRIPT=kernel/lds/riscv64-virt.ld
 KERNEL_IMAGE=kernel.riscv64
 
 # QEMU
@@ -16,36 +16,38 @@ RUN+=-bios none -kernel $(KERNEL_IMAGE)
 # Format
 INDENT_FLAGS=-linux -brf -i2
 
-all: uart syscon common mm plic process kernel_main
+all: uart printk syscon common mm plic process kernel_main
 	$(CC) *.o $(RUNTIME) $(CFLAGS) -T $(LINKER_SCRIPT) -o $(KERNEL_IMAGE)
 
 uart:
-	$(CC) -c src/uart/uart.c $(CFLAGS) -o uart.o
+	$(CC) -c kernel/uart/uart.c $(CFLAGS) -o uart.o
+
+printk:
+	$(CC) -c kernel/printk/printk.c $(CFLAGS) -o printk.o
 
 syscon:
-	$(CC) -c src/syscon/syscon.c $(CFLAGS) -o syscon.o
+	$(CC) -c kernel/syscon/syscon.c $(CFLAGS) -o syscon.o
 
 common:
-	$(CC) -c src/common/common.c $(CFLAGS) -o common.o
+	$(CC) -c kernel/common/common.c $(CFLAGS) -o common.o
 
 mm:
-	$(CC) -c src/mm/page.c $(CFLAGS) -o page.o
-	$(CC) -c src/mm/sv39.c $(CFLAGS) -o sv39.o
-	$(CC) -c src/mm/kmem.c $(CFLAGS) -o kmem.o
+	$(CC) -c kernel/mm/page.c $(CFLAGS) -o page.o
+	$(CC) -c kernel/mm/sv39.c $(CFLAGS) -o sv39.o
+	$(CC) -c kernel/mm/kmem.c $(CFLAGS) -o kmem.o
 
 plic:
-	$(CC) -c src/plic/trap_frame.c $(CFLAGS) -o trap_frame.o
-	$(CC) -c src/plic/cpu.c $(CFLAGS) -o cpu.o
-	$(CC) -c src/plic/trap_handler.c $(CFLAGS) -o trap_handler.o
-	$(CC) -c src/plic/plic.c $(CFLAGS) -o plic.o
+	$(CC) -c kernel/plic/trap_frame.c $(CFLAGS) -o trap_frame.o
+	$(CC) -c kernel/plic/cpu.c $(CFLAGS) -o cpu.o
+	$(CC) -c kernel/plic/trap_handler.c $(CFLAGS) -o trap_handler.o
 
 process:
-	$(CC) -c src/process/syscall.c $(CFLAGS) -o syscall.o
-	$(CC) -c src/process/process.c $(CFLAGS) -o process.o
-	$(CC) -c src/process/sched.c $(CFLAGS) -o sched.o
+	$(CC) -c kernel/process/syscall.c $(CFLAGS) -o syscall.o
+	$(CC) -c kernel/process/process.c $(CFLAGS) -o process.o
+	$(CC) -c kernel/process/sched.c $(CFLAGS) -o sched.o
 
 kernel_main:
-	$(CC) -c src/kernel_main.c $(CFLAGS) -o kernel_main.o
+	$(CC) -c kernel/kernel_main.c $(CFLAGS) -o kernel_main.o
 
 run: all
 	$(RUN)

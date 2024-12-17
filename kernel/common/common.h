@@ -3,6 +3,7 @@
 
 #include "../plic/cpu.h"
 #include "../uart/uart.h"
+#include "../printk/printk.h"
 
 #define __halt() ({					\
 	__set_mie(0);					\
@@ -10,7 +11,7 @@
 })
 
 #define __panic(format, ...) ({\
-	kprintf("Kernel panic at %s:%d:\n" format,	\
+	printk("Kernel panic at %s:%d:\n" format,	\
 		__FILE__,				\
 		__LINE__ 				\
 		__VA_OPT__(,) __VA_ARGS__ 		\

@@ -13,8 +13,8 @@ void uart_init(void)
 	volatile uint8_t *ptr = (uint8_t *) __uart_addr;
 
 	// Set word length to 8 (LCR[1:0])
-	const uint8_t LCR = 0b11;
-	ptr[3] = LCR;
+	const uint8_t lcr = 0b11;
+	ptr[3] = lcr;
 
 	// Enable FIFO (FCR[0])
 	ptr[2] = 0b1;
@@ -58,7 +58,7 @@ int kputchar(int character)
 static void kprint(const char *str)
 {
 	while (*str) {
-		kputchar((int)*str);
+		kputchar((int) *str);
 		++str;
 	}
 }
@@ -118,15 +118,17 @@ static void print_number_hex(uint64_t n, int base, int uppercase)
 // Limited version of vprintf() which only supports the following
 // specifiers:
 // 
-// - d/i: Signed decimal integer
-// - u: Unsigned decimal integer
-// - o: Unsigned octal
-// - x: Unsigned hexadecimal integer
-// - X: Unsigned hexadecimal integer (uppercase)
-// - c: Character
-// - s: String of characters
-// - p: Pointer address
-// - %: Literal '%'
+// +------+-------------------------------------------+
+// | d/i  | Signed decimal integer                    |
+// | u    | Unsigned decimal integer                  |
+// | o    | Unsigned octal                            |
+// | x    | Unsigned hexadecimal integer              |
+// | X    | Unsigned hexadecimal integer (uppercase)  |
+// | c    | Character                                 |
+// | s    | String of characters                      |
+// | p    | Pointer address                           |
+// | %    | Literal '%'                               |
+// +------+-------------------------------------------+
 // 
 // None of the sub-specifiers are supported for the sake of simplicity.
 // The `n` specifier is not supported since that is a major source of
