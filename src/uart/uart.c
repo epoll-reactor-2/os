@@ -70,6 +70,51 @@ int kputs(const char *str)
 	return 0;
 }
 
+static void print_number(uint64_t n, int base, int uppercase)
+{
+	char buf[20] = {0};
+	char *p = buf;
+	char lsh = base == 16 ? __to_hex_digit(n % 16) : '0' + n % base;
+	n /= base;
+
+	while (n) {
+		if (base == 16)
+			*p++ = __to_hex_digit(n % 16);
+		else
+			*p++ = '0' + n % base;
+		n /= base;
+	}
+
+	while (p != buf)
+		kputchar(*--p);
+
+	if (uppercase)
+		kputchar(toupper(lsh));
+	else
+		kputchar(lsh);
+}
+
+static void print_number_hex(uint64_t n, int base, int uppercase)
+{
+	char buf[20] = {0};
+	char *p = buf;
+	char lsh = __to_hex_digit(n % 16);
+	n /= base;
+
+	while (n) {
+		*p++ = __to_hex_digit(n % 16);
+		n /= base;
+	}
+
+	while (p != buf)
+		kputchar(*--p);
+
+	if (uppercase)
+		kputchar(toupper(lsh));
+	else
+		kputchar(lsh);
+}
+
 // Limited version of vprintf() which only supports the following
 // specifiers:
 // 
@@ -112,94 +157,29 @@ void kvprintf(const char *format, va_list arg)
 					n = ~n + 1;
 				}
 
-				char lsh = '0' + n % 10;
-				n /= 10;
-				char buf[9];
-				char *p_buf = buf;
-
-				while (n) {
-					*p_buf++ = '0' + n % 10;
-					n /= 10;
-				}
-
-				while (p_buf != buf)
-					kputchar(*--p_buf);
-
-				kputchar(lsh);
+				print_number(n, /* base */ 10, /* uppercase */ 0);
 				break;
 			}
 
 			case 'u': {
 				unsigned n = va_arg(arg, unsigned);
-				char lsh = '0' + n % 10;
-				n /= 10;
-				char buf[9];
-				char *p_buf = buf;
-
-				while (n) {
-					*p_buf++ = '0' + n % 10;
-					n /= 10;
-				}
-
-				while (p_buf != buf)
-					kputchar(*--p_buf);
-
-				kputchar(lsh);
+				print_number(n, /* base */ 10, /* uppercase */ 0);
 				break;
 			}
 			case 'o': {
 				unsigned n = va_arg(arg, unsigned);
-				char lsh = '0' + n % 8;
-				n /= 8;
-				char buf[10];
-				char *p_buf = buf;
-
-				while (n) {
-					*p_buf++ = '0' + n % 8;
-					n /= 8;
-				}
-
-				while (p_buf != buf)
-					kputchar(*--p_buf);
-
-				kputchar(lsh);
+				print_number(n, /* base */ 8, /* uppercase */ 0);
 				break;
 			}
 			case 'x': {
 				unsigned n = va_arg(arg, unsigned);
-				char lsh = __to_hex_digit(n % 16);
-				n /= 16;
-				char buf[7];
-				char *p_buf = buf;
-
-				while (n) {
-					*p_buf++ = __to_hex_digit(n % 16);
-					n /= 16;
-				}
-
-				while (p_buf != buf)
-					kputchar(*--p_buf);
-
-				kputchar(lsh);
+				print_number(n, /* base */ 16, /* uppercase */ 0);
 				break;
 			}
 
 			case 'X': {
 				unsigned n = va_arg(arg, unsigned);
-				char lsh = __to_hex_digit(n % 16);
-				n /= 16;
-				char buf[7];
-				char *p_buf = buf;
-
-				while (n) {
-					*p_buf++ = __to_hex_digit(n % 16);
-					n /= 16;
-				}
-
-				while (p_buf != buf)
-					kputchar(toupper(*--p_buf));
-
-				kputchar(toupper(lsh));
+				print_number(n, /* base */ 16, /* uppercase */ 1);
 				break;
 			}
 			case 'c':
@@ -210,21 +190,8 @@ void kvprintf(const char *format, va_list arg)
 				break;
 			case 'p': {
 				kprint("0x");
-				size_t ptr = va_arg(arg, size_t);
-				char lsh = __to_hex_digit(ptr % 16);
-				ptr /= 16;
-				char buf[15];
-				char *p_buf = buf;
-
-				while (ptr) {
-					*p_buf++ = __to_hex_digit(ptr % 16);
-					ptr /= 16;
-				}
-
-				while (p_buf != buf)
-					kputchar(*--p_buf);
-
-				kputchar(lsh);
+				size_t n = va_arg(arg, size_t);
+				print_number(n, /* base */ 16, /* uppercase */ 0);
 				break;
 			}
 			case '%':
