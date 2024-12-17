@@ -10,26 +10,6 @@
 #include "process/process.h"
 #include "process/sched.h"
 
-extern const size_t INIT_START;
-extern const size_t INIT_END;
-extern const size_t TEXT_START;
-extern const size_t TEXT_END;
-extern const size_t RODATA_START;
-extern const size_t RODATA_END;
-extern const size_t DATA_START;
-extern const size_t DATA_END;
-extern const size_t BSS_START;
-extern const size_t BSS_END;
-extern const size_t KERNEL_STACK_START;
-extern const size_t KERNEL_STACK_END;
-extern const size_t HEAP_START;
-extern const size_t HEAP_SIZE;
-extern const size_t MAKE_SYSCALL;
-extern size_t KERNEL_TABLE;
-
-const char HELLO[] =
-    "Hello World! This is a dynamically allocated string using the byte-grained allocator.";
-
 // Identity map range
 // Takes a contiguous allocation of memory and maps it using __page_size
 // `start` must not exceed `end`
@@ -50,7 +30,7 @@ void id_map_range(struct page_table *root, size_t start, size_t end,
 	}
 }
 
-void kmain(void)
+void kernel_main(void)
 {
 	uart_init();
 	page_init();

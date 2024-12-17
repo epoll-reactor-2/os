@@ -87,8 +87,8 @@ _start:
 	csrw mstatus, t0
 
 	# Machine exception program counter
-	# Set this to kmain so executing mret jumps to kmain
-	la t0, kmain
+	# Set this to kernel_main so executing mret jumps to kernel_main
+	la t0, kernel_main
 	csrw mepc, t0
 
 	# Do not allow interrupts in M-mode
@@ -115,10 +115,10 @@ __bss_zero_loop_end:
 	la sp, __kernel_stack_end
 	mv fp, sp
 
-	# If kmain returns, we're done with everything so halt forever
+	# If kernel_main returns, we're done with everything so halt forever
 	la ra, halt_forever
 
-	# Now jump to kmain for M-mode initialization
+	# Now jump to kernel_main for M-mode initialization
 	mret
 
 # We're already done with everything - let's halt forever
