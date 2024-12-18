@@ -1,72 +1,48 @@
 # Build
-CC=riscv64-unknown-elf-gcc
-CFLAGS=-ffreestanding -nostartfiles -nostdlib -nodefaultlibs
-CFLAGS+=-g -Wl,--gc-sections -mcmodel=medany -march=rv64g
-#CFLAGS+=-Wl,--no-warn-rwx-segments
-RUNTIME=kernel/asm/crt0.S
-LINKER_SCRIPT=kernel/lds/riscv64-virt.ld
-BUILD_DIR=os.release.riscv
-KERNEL_IMAGE=$(BUILD_DIR)/kernel.riscv64
+CC = riscv64-unknown-elf-gcc
+CFLAGS = -ffreestanding -nostartfiles -nostdlib -nodefaultlibs
+CFLAGS += -g -Wl,--gc-sections -mcmodel=medany -march=rv64g
+#CFLAGS += -Wl,--no-warn-rwx-segments
+RUNTIME = kernel/asm/crt0.S
+LINKER_SCRIPT = kernel/lds/riscv64-virt.ld
+BUILD_DIR = os.release.riscv
+KERNEL_IMAGE = $(BUILD_DIR)/kernel.riscv64
 
 # QEMU
-QEMU=qemu-system-riscv64
-MACH=virt
-RUN=$(QEMU) -nographic -machine $(MACH)
-RUN+=-bios none -kernel $(KERNEL_IMAGE)
+QEMU = qemu-system-riscv64
+MACH = virt
+RUN = $(QEMU) -nographic -machine $(MACH)
+RUN += -bios none -kernel $(KERNEL_IMAGE)
+
+SRC = $(shell find kernel misc -name '*.c')
+OBJ = $(patsubst %.c,$(BUILD_DIR)/%.o,$(SRC))
 
 # Format
-INDENT_FLAGS=-linux -brf -i2
+INDENT_FLAGS = -linux -brf -i2
 
-all: dir uart printk syscon common mm plic process kernel_main
-	$(CC) $(BUILD_DIR)/*.o $(RUNTIME) $(CFLAGS) -T $(LINKER_SCRIPT) -o $(KERNEL_IMAGE)
+all: dir $(KERNEL_IMAGE)
 
 dir:
 	@mkdir -p $(BUILD_DIR)
 
-uart:
-	$(CC) -c kernel/uart/uart.c $(CFLAGS) -o $(BUILD_DIR)/uart.o
+$(KERNEL_IMAGE): $(OBJ) $(RUNTIME)
+	@echo "  LD " $@
+	@$(CC) $^ $(CFLAGS) -T $(LINKER_SCRIPT) -o $@
 
-printk:
-	$(CC) -c kernel/printk/printk.c $(CFLAGS) -o $(BUILD_DIR)/printk.o
+$(BUILD_DIR)/%.o: %.c
+	@# This restores directory structure in build folder.
+	@mkdir -p $(dir $@)
+	@echo "  CC " $^
+	@$(CC) -c $< $(CFLAGS) -o $@
 
-syscon:
-	$(CC) -c kernel/syscon/syscon.c $(CFLAGS) -o $(BUILD_DIR)/syscon.o
-
-common:
-	$(CC) -c kernel/common/common.c $(CFLAGS) -o $(BUILD_DIR)/common.o
-
-mm:
-	$(CC) -c kernel/mm/page.c $(CFLAGS) -o $(BUILD_DIR)/page.o
-	$(CC) -c kernel/mm/sv39.c $(CFLAGS) -o $(BUILD_DIR)/sv39.o
-	$(CC) -c kernel/mm/kmem.c $(CFLAGS) -o $(BUILD_DIR)/kmem.o
-
-plic:
-	$(CC) -c kernel/plic/trap_frame.c $(CFLAGS) -o $(BUILD_DIR)/trap_frame.o
-	$(CC) -c kernel/plic/cpu.c $(CFLAGS) -o $(BUILD_DIR)/cpu.o
-	$(CC) -c kernel/plic/trap_handler.c $(CFLAGS) -o $(BUILD_DIR)/trap_handler.o
-
-process:
-	$(CC) -c kernel/process/syscall.c $(CFLAGS) -o $(BUILD_DIR)/syscall.o
-	$(CC) -c kernel/process/process.c $(CFLAGS) -o $(BUILD_DIR)/process.o
-	$(CC) -c kernel/process/sched.c $(CFLAGS) -o $(BUILD_DIR)/sched.o
-
-kernel_main:
-	$(CC) -c kernel/kernel_main.c $(CFLAGS) -o $(BUILD_DIR)/kernel_main.o
-
+.PHONY: run
 run: all
 	$(RUN)
 
+.PHONY: debug
 debug: all
 	$(RUN) -s -S
 
-format:
-	find . -name '*.h' -exec indent $(INDENT_FLAGS) '{}' \;
-	find . -name '*.c' -exec indent $(INDENT_FLAGS) '{}' \;
-	find . -name '*.h' -exec sed -i -r 's/(0) (b[01]+)/\1\2/g' '{}' \;
-	find . -name '*.c' -exec sed -i -r 's/(0) (b[01]+)/\1\2/g' '{}' \;
-	echo "You should now \`make run\` to confirm the project still builds and runs correctly"
-
+.PHONY: clean
 clean:
-	rm -vf *.o
-	rm -vf $(KERNEL_IMAGE)
-	find . -name '*~' -exec rm -vf '{}' \;
+	rm -rf $(BUILD_DIR)
