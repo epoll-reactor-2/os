@@ -2,7 +2,7 @@
 #include "kmem.h"
 #include "page.h"
 #include "../common/common.h"
-#include "../uart/uart.h"
+#include "../printk/printk.h"
 
 // Head of allocation. Start here when searching for free memory location
 static size_t *kmem_head = NULL;
@@ -64,7 +64,7 @@ void *kmalloc(size_t sz)
 	size_t *head = kmem_head;
 	size_t *tail = (size_t *)&((uint8_t *) kmem_head)[kmem_alloc * __page_size];
 
-	while ((size_t)head < (size_t)tail)
+	while ((size_t) head < (size_t)tail)
 		if (__kmem_metadata_is_free(head) && size <= __kmem_metadata_get_size(head)) {
 			size_t chunk_size = __kmem_metadata_get_size(head);
 			size_t remaining = chunk_size - size;
@@ -131,13 +131,15 @@ void kfree(void *ptr)
 void kmem_print_table(void)
 {
 	kputchar('\n');
-	kprintf("KMEM ALLOCATION TABLE\n");
+	printk("Memory allocation table\n");
 	size_t *head = kmem_head;
 	size_t *tail = (size_t *)&((uint8_t *) kmem_head)[kmem_alloc * __page_size];
 
 	while ((size_t)head < (size_t)tail) {
-		kprintf("%p: size = %d, taken = %d\n", head, __kmem_metadata_get_size(head),
-		__kmem_metadata_is_taken(head));
+		printk("%p: taken = %d, size = %d\n", head,
+			__kmem_metadata_is_taken(head),
+			__kmem_metadata_get_size(head)
+		);
 		head = (size_t *)&((uint8_t *) head)[__kmem_metadata_get_size(head)];
 	}
 

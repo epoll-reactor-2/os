@@ -80,6 +80,10 @@ void kernel_main(void)
 	printk("Initializing the process scheduler ...\n");
 	sched_init();
 
+	kmalloc(123);
+	kmem_print_table();
+	print_page_allocations();
+
 	printk("Adding a second and third process to test our scheduler ...\n");
 	sched_enqueue(init_process);
 

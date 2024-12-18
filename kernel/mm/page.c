@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include "page.h"
 #include "../common/common.h"
-#include "../uart/uart.h"
+#include "../printk/printk.h"
 
 extern const size_t HEAP_START;
 extern const size_t HEAP_SIZE;
@@ -146,17 +146,18 @@ void print_page_allocations(void)
 	size_t TOTAL_BYTES = num_pages * __page_size;
 
 	kputchar('\n');
-	kprintf("PAGE ALLOCATION TABLE\n");
-	kprintf("TOTAL USABLE MEMORY: %d pages (%d bytes)\n", num_pages, TOTAL_BYTES);
-	kprintf("METADATA: [%p, %p)\n", ptr, &ptr[num_pages]);
-	kprintf("PAGES: [%p, %p)\n", alloc_start, alloc_end);
-	kprintf("========================================\n");
+	printk("Page allocation table\n");
+	printk("|________________________________________________\n");
+	printk("| Total usable memory: %d pages (%d bytes)\n", num_pages, TOTAL_BYTES);
+	printk("| Metadata:            [%p, %p)\n", ptr, &ptr[num_pages]);
+	printk("| Pages:               [%p, %p)\n", alloc_start, alloc_end);
+	printk("|________________________________________________\n");
 
 	for (size_t i = 0; i < num_pages; ++i) {
 		if (ptr[i].flags & __page_taken) {
 			size_t start_addr = page_address_from_id(i);
 			if (ptr[i].flags & __page_last) {
-				kprintf("[%p, %p): 1 page\n", start_addr, start_addr + __page_size);
+				printk("|   [%p, %p): 1 page\n", start_addr, start_addr + __page_size);
 				++total;
 				continue;
 			}
@@ -177,15 +178,15 @@ void print_page_allocations(void)
 			size_t end_addr = page_address_from_id(i + 1);
 			size_t pages = (end_addr - start_addr) / __page_size;
 
-			kprintf("[%p, %p): %d pages\n", start_addr, end_addr, pages);
+			printk("|   [%p, %p): %d pages\n", start_addr, end_addr, pages);
 			total += pages;
 		}
 	}
 
-	kprintf("========================================\n");
 	size_t ALLOC_BYTES = total * __page_size;
-	kprintf("TOTAL ALLOCATED: %d pages (%d bytes)\n", total, ALLOC_BYTES);
-	kprintf("TOTAL FREE: %d pages (%d bytes)\n", num_pages - total,
+	printk("Total allocated: %d pages (%d bytes)\n", total, ALLOC_BYTES);
+	printk("Total free: %d pages (%d bytes)\n", num_pages - total,
 	TOTAL_BYTES - ALLOC_BYTES);
+	printk("_________________________________________________\n");
 	kputchar('\n');
 }
