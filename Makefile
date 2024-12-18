@@ -5,7 +5,8 @@ CFLAGS+=-g -Wl,--gc-sections -mcmodel=medany -march=rv64g
 #CFLAGS+=-Wl,--no-warn-rwx-segments
 RUNTIME=kernel/asm/crt0.S
 LINKER_SCRIPT=kernel/lds/riscv64-virt.ld
-KERNEL_IMAGE=kernel.riscv64
+BUILD_DIR=os.release.riscv
+KERNEL_IMAGE=$(BUILD_DIR)/kernel.riscv64
 
 # QEMU
 QEMU=qemu-system-riscv64
@@ -16,38 +17,41 @@ RUN+=-bios none -kernel $(KERNEL_IMAGE)
 # Format
 INDENT_FLAGS=-linux -brf -i2
 
-all: uart printk syscon common mm plic process kernel_main
-	$(CC) *.o $(RUNTIME) $(CFLAGS) -T $(LINKER_SCRIPT) -o $(KERNEL_IMAGE)
+all: dir uart printk syscon common mm plic process kernel_main
+	$(CC) $(BUILD_DIR)/*.o $(RUNTIME) $(CFLAGS) -T $(LINKER_SCRIPT) -o $(KERNEL_IMAGE)
+
+dir:
+	@mkdir -p $(BUILD_DIR)
 
 uart:
-	$(CC) -c kernel/uart/uart.c $(CFLAGS) -o uart.o
+	$(CC) -c kernel/uart/uart.c $(CFLAGS) -o $(BUILD_DIR)/uart.o
 
 printk:
-	$(CC) -c kernel/printk/printk.c $(CFLAGS) -o printk.o
+	$(CC) -c kernel/printk/printk.c $(CFLAGS) -o $(BUILD_DIR)/printk.o
 
 syscon:
-	$(CC) -c kernel/syscon/syscon.c $(CFLAGS) -o syscon.o
+	$(CC) -c kernel/syscon/syscon.c $(CFLAGS) -o $(BUILD_DIR)/syscon.o
 
 common:
-	$(CC) -c kernel/common/common.c $(CFLAGS) -o common.o
+	$(CC) -c kernel/common/common.c $(CFLAGS) -o $(BUILD_DIR)/common.o
 
 mm:
-	$(CC) -c kernel/mm/page.c $(CFLAGS) -o page.o
-	$(CC) -c kernel/mm/sv39.c $(CFLAGS) -o sv39.o
-	$(CC) -c kernel/mm/kmem.c $(CFLAGS) -o kmem.o
+	$(CC) -c kernel/mm/page.c $(CFLAGS) -o $(BUILD_DIR)/page.o
+	$(CC) -c kernel/mm/sv39.c $(CFLAGS) -o $(BUILD_DIR)/sv39.o
+	$(CC) -c kernel/mm/kmem.c $(CFLAGS) -o $(BUILD_DIR)/kmem.o
 
 plic:
-	$(CC) -c kernel/plic/trap_frame.c $(CFLAGS) -o trap_frame.o
-	$(CC) -c kernel/plic/cpu.c $(CFLAGS) -o cpu.o
-	$(CC) -c kernel/plic/trap_handler.c $(CFLAGS) -o trap_handler.o
+	$(CC) -c kernel/plic/trap_frame.c $(CFLAGS) -o $(BUILD_DIR)/trap_frame.o
+	$(CC) -c kernel/plic/cpu.c $(CFLAGS) -o $(BUILD_DIR)/cpu.o
+	$(CC) -c kernel/plic/trap_handler.c $(CFLAGS) -o $(BUILD_DIR)/trap_handler.o
 
 process:
-	$(CC) -c kernel/process/syscall.c $(CFLAGS) -o syscall.o
-	$(CC) -c kernel/process/process.c $(CFLAGS) -o process.o
-	$(CC) -c kernel/process/sched.c $(CFLAGS) -o sched.o
+	$(CC) -c kernel/process/syscall.c $(CFLAGS) -o $(BUILD_DIR)/syscall.o
+	$(CC) -c kernel/process/process.c $(CFLAGS) -o $(BUILD_DIR)/process.o
+	$(CC) -c kernel/process/sched.c $(CFLAGS) -o $(BUILD_DIR)/sched.o
 
 kernel_main:
-	$(CC) -c kernel/kernel_main.c $(CFLAGS) -o kernel_main.o
+	$(CC) -c kernel/kernel_main.c $(CFLAGS) -o $(BUILD_DIR)/kernel_main.o
 
 run: all
 	$(RUN)
