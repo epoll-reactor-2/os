@@ -1,5 +1,5 @@
-#include "../printk/printk.h"
-#include "../uart/uart.h"
+#include "printk/printk.h"
+#include "uart/uart.h"
 #include <stdarg.h>
 
 void printk(const char *fmt, ...)

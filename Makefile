@@ -1,6 +1,7 @@
 # Build
 CC = riscv64-unknown-elf-gcc
 CFLAGS = -ffreestanding -nostartfiles -nostdlib -nodefaultlibs
+CFLAGS += -I kernel
 CFLAGS += -g -Wl,--gc-sections -mcmodel=medany -march=rv64g
 #CFLAGS += -Wl,--no-warn-rwx-segments
 RUNTIME = kernel/asm/crt0.S

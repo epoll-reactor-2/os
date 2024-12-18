@@ -1,6 +1,6 @@
 #include <stdint.h>
-#include "syscon.h"
-#include "../printk/printk.h"
+#include "syscon/syscon.h"
+#include "printk/printk.h"
 
 
 /* These numbers are connected with DTS somehow. */

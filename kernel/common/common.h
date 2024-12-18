@@ -1,9 +1,9 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#include "../plic/cpu.h"
-#include "../uart/uart.h"
-#include "../printk/printk.h"
+#include "plic/cpu.h"
+#include "uart/uart.h"
+#include "printk/printk.h"
 
 #define __halt() ({					\
 	__set_mie(0);					\

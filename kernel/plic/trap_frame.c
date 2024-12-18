@@ -1,5 +1,5 @@
 #include <stddef.h>
-#include "trap_frame.h"
+#include "plic/trap_frame.h"
 
 static struct trap_frame frame = __trap_frame_zero;
 

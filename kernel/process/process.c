@@ -1,9 +1,9 @@
-#include "process.h"
-#include "syscall.h"
-#include "../mm/kmem.h"
-#include "../common/common.h"
-#include "../mm/page.h"
-#include "../mm/sv39.h"
+#include "common/common.h"
+#include "mm/kmem.h"
+#include "mm/page.h"
+#include "mm/sv39.h"
+#include "process/process.h"
+#include "process/syscall.h"
 
 extern const size_t MAKE_SYSCALL;
 
@@ -12,34 +12,35 @@ static uint16_t NEXT_PID = 1;
 // This is just a temporary measure
 // Ideally, we want to move our hardcoded init process
 // out of the kernel as soon as possible
-void init_process(void)
+void process_init(void)
 {
 	while (1) {
 		for (size_t i = 0; i < 70000000; ++i)
 			;
+
 		make_syscall(1);
 	}
 }
 
-struct process *create_process(void (*func)(void))
+struct process *process_create(void (*func)(void))
 {
-	size_t func_paddr = (size_t)func;	// determine process physical address
+	size_t func_paddr = (size_t) func;	// determine process physical address
 	size_t func_vaddr = func_paddr;	// set process virtual address
 
 	// Initialize process structure
 	struct process *process = kmalloc(sizeof (struct process));
 
 	__assert(process != NULL,
-		"create_process(): failed to allocate memory for process structure\n");
+		"process_create(): failed to allocate memory for process structure\n");
 
 	process->frame = (struct trap_frame *)alloc_page();
 	__assert(process->frame != NULL,
-		"create_process(): failed to allocate page for process context frame\n");
+		"process_create(): failed to allocate page for process context frame\n");
 
 	process->stack = alloc_pages(__stack_pages);
 
 	__assert(process->stack != NULL,
-		"create_process(): failed to allocate %d pages for process stack\n",
+		"process_create(): failed to allocate %d pages for process stack\n",
 		__stack_pages);
 
 	process->pc = func_vaddr;
@@ -47,7 +48,7 @@ struct process *create_process(void (*func)(void))
 	process->root = (struct page_table *) alloc_page();
 
 	__assert(process->root != NULL,
-		"create_process(): failed to allocate page for process root page table\n");
+		"process_create(): failed to allocate page for process root page table\n");
 
 	process->state = __process_running;
 	process->sleep_until = 0;
@@ -72,4 +73,13 @@ struct process *create_process(void (*func)(void))
 	map(process->root, MAKE_SYSCALL, MAKE_SYSCALL, __pte_user_rx, 0);
 
 	return process;
+}
+
+void process_switch_to_user(struct process *process)
+{
+	switch_to_user(
+		(size_t) process->frame, process->pc,
+		__satp_from(
+			__mode_sv39, process->pid,
+			(size_t) process->root >> __page_order));
 }

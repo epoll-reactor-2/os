@@ -212,11 +212,13 @@ switch_to_user:
 	li t0, 0xAAA
 	csrw mie, t0
 
-	# Set interrupt handler
+	# Set interrupt handler. When an interrupt or exception occurs in
+	# M-mode, control will transfer to the address specified in mtvec
 	la t0, interrupt_handler
 	csrw mtvec, t0
 
-	# Sync SATP for all address spaces, for all harts
+	# When an interrupt or exception occurs in M-mode, control
+	# will transfer to the address specified in mtvec
 	sfence.vma
 
 	# Define PMP region to allow (indirect) access to all
@@ -227,6 +229,7 @@ switch_to_user:
 	#      A=TOR         X=1        W=1        R=1
 	li t0, (0b01 << 3) | (1 << 2) | (1 << 1) | (1 << 0)
 	csrw pmpcfg0, t0
+
 	# Set all 1's for the top address (exclusive)
 	# The bottom address (inclusive) is implicitly 0 when setting
 	# pmpcfg0 and pmpaddr0
@@ -241,5 +244,5 @@ switch_to_user:
 		.set i, i + 1
 	.endr
 
-	# Now jump to U-mode
+	# Now jump to U-mode. Execution resumes in the user process.
 	mret

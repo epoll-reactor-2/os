@@ -1,15 +1,15 @@
 #include <stdint.h>
-#include "trap_handler.h"
-#include "../printk/printk.h"
-#include "../common/common.h"
-#include "cpu.h"
-#include "plic.h"
-#include "../syscon/syscon.h"
-#include "../process/syscall.h"
-#include "../process/sched.h"
-#include "../process/process.h"
-#include "../mm/sv39.h"
-#include "../mm/page.h"
+#include "common/common.h"
+#include "mm/sv39.h"
+#include "mm/page.h"
+#include "plic/trap_handler.h"
+#include "plic/cpu.h"
+#include "plic/plic.h"
+#include "syscon/syscon.h"
+#include "printk/printk.h"
+#include "process/syscall.h"
+#include "process/sched.h"
+#include "process/process.h"
 
 // Handle only the following interrupts for now:
 //
@@ -37,9 +37,7 @@ size_t m_mode_trap_handler(size_t epc, size_t tval, size_t cause, size_t hart,
 			printk("Context switch: scheduling next process with PID = %d\n",
 				process->pid);
 
-			switch_to_user((size_t)process->frame, process->pc,
-				__satp_from(__mode_sv39, process->pid,
-				(size_t)process->root >> __page_order));
+			process_switch_to_user(process);
 
 			break;
 		}

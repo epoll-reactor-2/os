@@ -1,8 +1,8 @@
 #include <stddef.h>
-#include "sv39.h"
-#include "../common/common.h"
-#include "../uart/uart.h"
-#include "../mm/page.h"
+#include "mm/page.h"
+#include "mm/sv39.h"
+#include "common/common.h"
+#include "uart/uart.h"
 
 /*
  * Map a virtual address to a physical address

@@ -84,8 +84,13 @@ void kernel_main(void)
 	kmem_print_table();
 	print_page_allocations();
 
-	printk("Adding a second and third process to test our scheduler ...\n");
-	sched_enqueue(init_process);
+	printk("Adding few processes to scheduler ...\n");
+	sched_enqueue(process_init);
+	sched_enqueue(process_init);
+	sched_enqueue(process_init);
+	sched_enqueue(process_init);
+	sched_enqueue(process_init);
+	sched_enqueue(process_init);
 
 	sched_print_ptree();
 
@@ -99,9 +104,7 @@ void kernel_main(void)
 	printk("Issuing our first context switch timer ...\n");
 	set_timer_interrupt_delay_us(1 * __us_per_second);
 
-	switch_to_user((size_t)process->frame, process->pc,
-		__satp_from(__mode_sv39, process->pid,
-		(size_t)process->root >> __page_order));
+	process_switch_to_user(process);
 
 	__panic("kmain(): failed to start our first process!\n");
 }

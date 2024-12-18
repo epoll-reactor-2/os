@@ -2,7 +2,7 @@
 #define SYSCALL_H
 
 #include <stddef.h>
-#include "../plic/trap_frame.h"
+#include "plic/trap_frame.h"
 
 #define __syscall_exit		0
 #define __syscall_test		1

@@ -3,10 +3,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include "../plic/trap_frame.h"
-
-// Defined in src/asm/crt0.s
-void switch_to_user(size_t, size_t, size_t);
+#include "plic/trap_frame.h"
 
 // Number of pages per process stack
 #define __stack_pages 2
@@ -18,7 +15,7 @@ void switch_to_user(size_t, size_t, size_t);
 #define __process_start_addr 0x80000000ull
 
 // Init process - hardcoded for now, for testing purposes only
-void init_process(void);
+void process_init(void);
 
 // - __process_running:  the process is ready to run whenever
 //                       the scheduler picks it
@@ -52,6 +49,10 @@ struct process {
 };
 
 // Create a new process from function pointer
-struct process *create_process(void (*)(void));
+struct process *process_create(void (*)(void));
+void            process_switch_to_user(struct process *process);
+
+// Defined in src/asm/crt0.s
+void switch_to_user(size_t frame_addr, size_t pc, size_t satp);
 
 #endif

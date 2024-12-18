@@ -2,8 +2,8 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include <limits.h>
-#include "uart.h"
-#include "../common/common.h"
+#include "uart/uart.h"
+#include "common/common.h"
 
 /*
  * Initialize NS16550A UART

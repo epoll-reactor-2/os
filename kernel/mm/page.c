@@ -1,7 +1,7 @@
 #include <stdbool.h>
-#include "page.h"
-#include "../common/common.h"
-#include "../printk/printk.h"
+#include "common/common.h"
+#include "mm/page.h"
+#include "printk/printk.h"
 
 extern const size_t HEAP_START;
 extern const size_t HEAP_SIZE;

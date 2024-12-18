@@ -1,6 +1,5 @@
 #include <stdarg.h>
 #include "common.h"
-#include "../uart/uart.h"
 
 int toupper(int c)
 {

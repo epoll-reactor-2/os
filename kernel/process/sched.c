@@ -1,9 +1,9 @@
 #include <stddef.h>
-#include "sched.h"
-#include "../common/common.h"
-#include "process.h"
-#include "../mm/kmem.h"
-#include "../printk/printk.h"
+#include "common/common.h"
+#include "mm/kmem.h"
+#include "process/process.h"
+#include "process/sched.h"
+#include "printk/printk.h"
 
 static struct process_ll *processes = NULL;
 
@@ -11,8 +11,6 @@ void sched_init(void)
 {
 	__assert(processes == NULL,
 		"sched_init(): should only be called once at system startup\n");
-
-	sched_enqueue(init_process);
 }
 
 void sched_enqueue(void (*func)(void))
@@ -22,7 +20,7 @@ void sched_enqueue(void (*func)(void))
 	__assert(nd != NULL,
 		"sched_enqueue(): failed to allocate linked list node for new process\n");
 
-	nd->process = create_process(func);
+	nd->process = process_create(func);
 
 	if (processes == NULL) {
 		nd->prev = nd;
