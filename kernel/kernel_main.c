@@ -87,6 +87,8 @@ void kernel_main(void)
 	printk("Adding a second and third process to test our scheduler ...\n");
 	sched_enqueue(init_process);
 
+	sched_print_ptree();
+
 	printk("Starting our first process ...\n");
 	struct process *process = sched_schedule();
 	__assert(process != NULL,

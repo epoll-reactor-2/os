@@ -145,12 +145,11 @@ void print_page_allocations(void)
 	size_t total = 0;
 	size_t TOTAL_BYTES = num_pages * __page_size;
 
-	kputchar('\n');
 	printk("Page allocation table\n");
-	printk("|________________________________________________\n");
-	printk("| Total usable memory: %d pages (%d bytes)\n", num_pages, TOTAL_BYTES);
-	printk("| Metadata:            [%p, %p)\n", ptr, &ptr[num_pages]);
-	printk("| Pages:               [%p, %p)\n", alloc_start, alloc_end);
+	printk("_________________________________________________\n");
+	printk("|   Total usable memory: %d pages (%d bytes)\n", num_pages, TOTAL_BYTES);
+	printk("|   Metadata:            [%p, %p)\n", ptr, &ptr[num_pages]);
+	printk("|   Pages:               [%p, %p)\n", alloc_start, alloc_end);
 	printk("|________________________________________________\n");
 
 	for (size_t i = 0; i < num_pages; ++i) {
@@ -184,9 +183,10 @@ void print_page_allocations(void)
 	}
 
 	size_t ALLOC_BYTES = total * __page_size;
-	printk("Total allocated: %d pages (%d bytes)\n", total, ALLOC_BYTES);
-	printk("Total free: %d pages (%d bytes)\n", num_pages - total,
-	TOTAL_BYTES - ALLOC_BYTES);
-	printk("_________________________________________________\n");
-	kputchar('\n');
+	printk("|\n");
+	printk("|   Total allocated: %d pages (%d bytes)\n", total, ALLOC_BYTES);
+	printk("|   Total free:      %d pages (%d bytes)\n", num_pages - total,
+		TOTAL_BYTES - ALLOC_BYTES);
+	printk("|________________________________________________\n");
+	printk("\n");
 }

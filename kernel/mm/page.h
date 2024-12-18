@@ -7,7 +7,7 @@
 #define __page_taken 	(1 << 0)
 #define __page_last 	(1 << 1)
 #define __page_order 	12
-#define __page_size 	(1 << __page_order)
+#define __page_size 	(1 << __page_order) /* 4096 */
 
 struct page {
 	uint8_t flags;

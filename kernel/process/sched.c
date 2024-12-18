@@ -3,6 +3,7 @@
 #include "../common/common.h"
 #include "process.h"
 #include "../mm/kmem.h"
+#include "../printk/printk.h"
 
 static struct process_ll *processes = NULL;
 
@@ -48,4 +49,22 @@ struct process *sched_schedule(void)
 	processes = processes->next;
 
 	return process;
+}
+
+void sched_print_ptree()
+{
+	printk("\n");
+
+	printk("Process table\n");
+	printk("_________________________________________________\n");
+
+	struct process_ll *current = processes;
+
+	do {
+		printk("|  PID %d\n", current->process->pid);
+		current = current->next;
+	} while (current != processes);
+
+	printk("|________________________________________________\n");
+	printk("\n");
 }

@@ -130,18 +130,19 @@ void kfree(void *ptr)
 // Print the kmem table for debugging
 void kmem_print_table(void)
 {
-	kputchar('\n');
+	printk("\n");
 	printk("Memory allocation table\n");
+	printk("_________________________________________________\n");
 	size_t *head = kmem_head;
 	size_t *tail = (size_t *)&((uint8_t *) kmem_head)[kmem_alloc * __page_size];
 
-	while ((size_t)head < (size_t)tail) {
-		printk("%p: taken = %d, size = %d\n", head,
+	while ((size_t) head < (size_t) tail) {
+		printk("|   %p: taken = %d, size = %d\n", head,
 			__kmem_metadata_is_taken(head),
 			__kmem_metadata_get_size(head)
 		);
 		head = (size_t *)&((uint8_t *) head)[__kmem_metadata_get_size(head)];
 	}
-
-	kputchar('\n');
+	printk("|________________________________________________\n");
+	printk("\n");
 }
