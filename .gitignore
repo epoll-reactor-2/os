@@ -1,3 +1,4 @@
 **/*.o
 kernel.riscv64
 .config
+*.dtb

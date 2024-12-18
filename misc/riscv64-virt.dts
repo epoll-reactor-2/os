@@ -1,5 +1,12 @@
 /dts-v1/;
 
+// DTS is obtained from QEMU.
+//
+// $ qemu-system-riscv64 -machine virt -machine dumpdtb=qemu.dtb
+// $ dtc -I dtb -O dts -o - qemu.dtb
+//
+// Then we can access it using __syscon_addr, I guess.
+
 / {
 	#address-cells = <0x02>;
 	#size-cells = <0x02>;
