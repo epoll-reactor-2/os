@@ -83,6 +83,11 @@ size_t m_mode_trap_handler(size_t epc, size_t tval, size_t cause, size_t hart,
 			__halt();
 			break;
 
+		case 3:
+			// FPU disabled trap
+			printk("FPU disabled trap at EPC: %p\n", epc);
+			break;
+
 		case 8:
 			// U-mode syscall
 			return_pc = do_syscall(return_pc, frame);
@@ -103,8 +108,8 @@ size_t m_mode_trap_handler(size_t epc, size_t tval, size_t cause, size_t hart,
 			break;
 
 		default:
-		__panic("m_mode_trap_handler(): unknown synchronous trap with exception code %d\n",
-			exception_code);
+			__panic("m_mode_trap_handler(): unknown synchronous trap with exception code %d\n",
+				exception_code);
 
 		}
 	}

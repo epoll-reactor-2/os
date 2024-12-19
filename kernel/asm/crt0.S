@@ -7,17 +7,27 @@
 # Common symbols
 .set NUM_GP_REGS, 32
 .set REG_SIZE, 8
+.set NUM_FPU_REGS, 32
+.set FPU_REG_SIZE, 8
 
 # Use alternative macro syntax (see GNU assembler docs for details)
 .altmacro
 
 # Common macros
 .macro save_gp i, basereg=t6
-	sd x\i, ((\i) * REG_SIZE)(\basereg)
+	sd x\i, \i * REG_SIZE(\basereg)
 .endm
 
 .macro load_gp i, basereg=t6
-	ld x\i, ((\i) * REG_SIZE)(\basereg)
+	ld x\i, \i * REG_SIZE(\basereg)
+.endm
+
+.macro save_fpu_regs i, basereg=t6
+	fsd f\i, \i * FPU_REG_SIZE(\basereg)
+.endm
+
+.macro load_fpu_regs i, basereg=t6
+	fld f\i, \i * FPU_REG_SIZE(\basereg)
 .endm
 
 # Importation of linker symbols
@@ -86,6 +96,10 @@ _start:
 	li t0, 0b11 << 11
 	csrw mstatus, t0
 
+	# Enable FPU
+	li t0, 0x6000
+	csrs mstatus, t0
+
 	# Machine exception program counter
 	# Set this to kernel_main so executing mret jumps to kernel_main
 	la t0, kernel_main
@@ -152,6 +166,12 @@ interrupt_handler:
 		save_gp %i
 		.set i, i + 1
 	.endr
+	.set i, 0
+	.rept NUM_FPU_REGS
+		save_fpu_regs %i
+		.set i, i + 1
+	.endr
+
 	mv t5, t6
 	csrr t6, mscratch
 	save_gp 31, t5
@@ -183,6 +203,11 @@ interrupt_handler:
 		load_gp %i
 		.set i, i + 1
 	.endr
+	.set i, 0
+	.rept NUM_FPU_REGS
+		load_fpu_regs %i
+		.set i, i + 1
+	.endr
 
 	# Continue execution at the given PC value
 	mret
@@ -197,8 +222,10 @@ switch_to_user:
 	# a0 - frame address
 	csrw mscratch, a0
 
+	# I guess after floats manipulations,
+	# kernel halts there during switch
 	# Set MPP=0 (U-mode), MPIE=1, SPIE=1
-	li t0, (0b00 << 11) | (1 << 7) | (1 << 5)
+	li t0, (0b11 << 11) | (1 << 7) | (1 << 5)
 	csrw mstatus, t0
 
 	# a1 - program counter
@@ -243,6 +270,10 @@ switch_to_user:
 		load_gp %i, t6
 		.set i, i + 1
 	.endr
-
+	.set i, 0
+	.rept NUM_FPU_REGS
+		load_fpu_regs %i
+		.set i, i + 1
+	.endr
 	# Now jump to U-mode. Execution resumes in the user process.
 	mret

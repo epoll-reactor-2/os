@@ -73,6 +73,8 @@ void kernel_main(void)
 
 	printk_intro();
 
+	printk("FPU test: %f\n", 1.23 / 0.00000000000000001);
+
 	__plic_set_threshold(0);
 	__plic_enable(__plic_uart);
 	__plic_set_prio(__plic_uart, 1);
@@ -80,6 +82,7 @@ void kernel_main(void)
 
 	printk("Initializing the process scheduler ...\n");
 	sched_init();
+
 
 	kmalloc(123);
 	kmem_print_table();
@@ -104,6 +107,7 @@ void kernel_main(void)
 
 	printk("Issuing our first context switch timer ...\n");
 	set_timer_interrupt_delay_us(1 * __us_per_second);
+	printk("Timer done\n");
 
 	process_switch_to_user(process);
 
