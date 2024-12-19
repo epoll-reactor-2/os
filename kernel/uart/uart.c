@@ -74,24 +74,20 @@ static void print_number(uint64_t n, int base, int uppercase)
 {
 	char buf[20] = {0};
 	char *p = buf;
-	char lsh = base == 16 ? __to_hex_digit(n % 16) : '0' + n % base;
-	n /= base;
+	char *alphabet = uppercase
+		? "0123456789ABCDEF"
+		: "0123456789abcdef";
+
+	if (n == 0)
+		*p++ = alphabet[0];
 
 	while (n) {
-		if (base == 16)
-			*p++ = __to_hex_digit(n % 16);
-		else
-			*p++ = '0' + n % base;
+		*p++ = alphabet[n % base];
 		n /= base;
 	}
 
 	while (p != buf)
 		kputchar(*--p);
-
-	if (uppercase)
-		kputchar(toupper(lsh));
-	else
-		kputchar(lsh);
 }
 
 static void print_number_hex(uint64_t n, int base, int uppercase)
@@ -113,6 +109,43 @@ static void print_number_hex(uint64_t n, int base, int uppercase)
 		kputchar(toupper(lsh));
 	else
 		kputchar(lsh);
+}
+
+static size_t number_len(int64_t n, int base)
+{
+	size_t len = (n == 0) ? 1 : 0;
+
+	if (n < 0)
+		n = -n;
+
+	while (n > 0) {
+		n /= base;
+		len++;
+	}
+
+	return len;
+}
+
+static void print_float(double value, int precision)
+{
+	if (value < 0) {
+		kputchar('-');
+		value = -value;
+	}
+
+	uint64_t i = (uint64_t) value;
+	double frac = value - (double) i;
+
+	print_number(i, 10, /* uppercase */ 0);
+
+	kputchar('.');
+
+	for (int i = 0; i < precision; i++) {
+		frac *= 10;
+		int digit = (int) frac;
+		kputchar('0' + digit);
+		frac -= digit;
+	}
 }
 
 // Limited version of vprintf() which only supports the following
@@ -145,6 +178,14 @@ void kvprintf(const char *format, va_list arg)
 			if (!*format)
 				return;
 
+			// Handle width specifier
+			int width = 0;
+			while (*format >= '0' && *format <= '9')
+			{
+				width = width * 10 + (*format - '0');
+				++format;
+			}
+
 			switch (*format) {
 			case 'd':
 			case 'i': {
@@ -154,12 +195,39 @@ void kvprintf(const char *format, va_list arg)
 					break;
 				}
 
-				if (n < 0) {
+				int neg = n < 0;
+
+				if (neg) {
 					kputchar('-');
 					n = ~n + 1;
 				}
 
+				int abs_n = neg ? -n : n;
+				int len = number_len(abs_n, 10) + (neg ? 1 : 0);
+				int padding = (width > len) ? (width - len) : 0;
+
 				print_number(n, /* base */ 10, /* uppercase */ 0);
+
+				while (padding-- > 0)
+					kputchar(' ');
+
+				break;
+			}
+
+			case 'f': {
+				double n = va_arg(arg, double);
+
+				int neg = n < 0;
+
+				int abs_n = neg ? -n : n;
+				int len = number_len(abs_n, 10) + (neg ? 1 : 0);
+				int padding = (width > len) ? (width - len) : 0;
+
+				print_float(n, 6);
+
+				while (padding-- > 0)
+					kputchar(' ');
+
 				break;
 			}
 
