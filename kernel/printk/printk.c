@@ -4,7 +4,8 @@
 
 void printk(const char *fmt, ...)
 {
-	kprintf("[0.000000] ");
+	/* Return carriage. Needed for serial interfaces. */
+	kprintf("\r[0.000000] ");
 
 	va_list args;
 	va_start(args, fmt);

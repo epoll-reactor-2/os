@@ -12,8 +12,6 @@ KERNEL_IMAGE = $(BUILD_DIR)/kernel.riscv64
 # QEMU
 QEMU = qemu-system-riscv64
 MACH = virt
-RUN = $(QEMU) -nographic -machine $(MACH)
-RUN += -bios none -kernel $(KERNEL_IMAGE)
 
 SRC = $(shell find kernel misc -name '*.c')
 OBJ = $(patsubst %.c,$(BUILD_DIR)/%.o,$(SRC))
@@ -38,7 +36,11 @@ $(BUILD_DIR)/%.o: %.c
 
 .PHONY: run
 run: all
-	$(RUN)
+	$(QEMU) -machine $(MACH) -kernel $(KERNEL_IMAGE) -nographic -bios none -monitor none
+
+.PHONY: run_gui
+run_gui: all
+	$(QEMU) -machine $(MACH) -kernel $(KERNEL_IMAGE) -display sdl -bios none -monitor none
 
 .PHONY: debug
 debug: all
