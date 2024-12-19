@@ -80,12 +80,21 @@ size_t m_mode_trap_handler(size_t epc, size_t tval, size_t cause, size_t hart,
 		switch (exception_code) {
 		case 2:
 			// Illegal instruction
+			kprintf("--- Kernel panic ---\n");
+			kprintf("Illegal instr\n");
 			__halt();
 			break;
 
 		case 3:
 			// FPU disabled trap
 			printk("FPU disabled trap at EPC: %p\n", epc);
+			break;
+
+		case 7:
+			__panic("Non-naturally aligned store access attempt to an I/O region.\n"
+				"Store-Conditional or Atomic Memory Operation (AMO) attempt to\n"
+				"region without atomic support. Store attempt with address failing PMP check.\n");
+			__halt();
 			break;
 
 		case 8:

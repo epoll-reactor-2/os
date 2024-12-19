@@ -1,8 +1,9 @@
 # Build
 CC = riscv64-unknown-elf-gcc
+GDB = riscv64-elf-gdb
 CFLAGS = -ffreestanding -nostartfiles -nostdlib -nodefaultlibs
 CFLAGS += -I kernel
-CFLAGS += -g -Wl,--gc-sections -mcmodel=medany -march=rv64g
+CFLAGS += -O0 -g -Wl,--gc-sections -mcmodel=medany -march=rv64g
 #CFLAGS += -Wl,--no-warn-rwx-segments
 RUNTIME = kernel/asm/crt0.S
 LINKER_SCRIPT = kernel/lds/riscv64-virt.ld
@@ -34,6 +35,10 @@ $(BUILD_DIR)/%.o: %.c
 	@echo "  CC " $^
 	@$(CC) -c $< $(CFLAGS) -o $@
 
+# To debug:
+# qemu cmd with -S -s
+# riscv64-elf-gdb -ex "target remote localhost:1234" -ex "symbol-file os.release.riscv/kernel.riscv64"
+
 .PHONY: run
 run: all
 	$(QEMU) -machine $(MACH) -kernel $(KERNEL_IMAGE) -nographic -bios none -monitor none
@@ -41,10 +46,6 @@ run: all
 .PHONY: run_gui
 run_gui: all
 	$(QEMU) -machine $(MACH) -kernel $(KERNEL_IMAGE) -display sdl -bios none -monitor none
-
-.PHONY: debug
-debug: all
-	$(RUN) -s -S
 
 .PHONY: clean
 clean:

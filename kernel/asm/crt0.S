@@ -23,11 +23,11 @@
 .endm
 
 .macro save_fpu_regs i, basereg=t6
-	fsd f\i, \i * FPU_REG_SIZE(\basereg)
+#	fsd f\i, \i * FPU_REG_SIZE(\basereg)
 .endm
 
 .macro load_fpu_regs i, basereg=t6
-	fld f\i, \i * FPU_REG_SIZE(\basereg)
+#	fld f\i, \i * FPU_REG_SIZE(\basereg)
 .endm
 
 # Importation of linker symbols
@@ -166,11 +166,11 @@ interrupt_handler:
 		save_gp %i
 		.set i, i + 1
 	.endr
-	.set i, 0
-	.rept NUM_FPU_REGS
-		save_fpu_regs %i
-		.set i, i + 1
-	.endr
+	# .set i, 0
+	# .rept NUM_FPU_REGS
+	# 	save_fpu_regs %i
+	# 	.set i, i + 1
+	# .endr
 
 	mv t5, t6
 	csrr t6, mscratch

@@ -5,6 +5,10 @@
 
 void printk(const char *fmt, ...)
 {
+	/* Some illegal instruction..........
+	   Also, we cannot print kernel panic with
+	   printk, since there is problem with floats. */
+
 	size_t mtime_value = *(volatile size_t *) __mtime_addr;
 	size_t elapsed_us = mtime_value / (__ticks_per_second / __us_per_second);
 
