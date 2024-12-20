@@ -10,6 +10,7 @@
 #include "plic/plic.h"
 #include "process/process.h"
 #include "process/sched.h"
+#include "config.h"
 
 // Identity map range
 // Takes a contiguous allocation of memory and maps it using __page_size
@@ -73,7 +74,9 @@ void kernel_main(void)
 
 	printk_intro();
 
+#if !CONFIG_FPU
 	printk("FPU test: %f\n", 1.23 / 0.00000000000000001);
+#endif /* CONFIG_FPU */
 
 	__plic_set_threshold(0);
 	__plic_enable(__plic_uart);

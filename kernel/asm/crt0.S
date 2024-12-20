@@ -111,13 +111,11 @@ _start:
 	# Zero the BSS section
 	la t0, __bss_start
 	la t1, __bss_end
-
 __bss_zero_loop_start:
 	bgeu t0, t1, __bss_zero_loop_end
 	sd zero, 0(t0)
 	addi t0, t0, 8
 	j __bss_zero_loop_start
-
 __bss_zero_loop_end:
 	# Initialize global pointer register
 	.option push
@@ -166,11 +164,12 @@ interrupt_handler:
 		save_gp %i
 		.set i, i + 1
 	.endr
-	# .set i, 0
-	# .rept NUM_FPU_REGS
-	# 	save_fpu_regs %i
-	# 	.set i, i + 1
-	# .endr
+
+	.set i, 0
+	.rept NUM_FPU_REGS
+		save_fpu_regs %i
+		.set i, i + 1
+	.endr
 
 	mv t5, t6
 	csrr t6, mscratch
@@ -203,6 +202,7 @@ interrupt_handler:
 		load_gp %i
 		.set i, i + 1
 	.endr
+
 	.set i, 0
 	.rept NUM_FPU_REGS
 		load_fpu_regs %i
@@ -222,10 +222,8 @@ switch_to_user:
 	# a0 - frame address
 	csrw mscratch, a0
 
-	# I guess after floats manipulations,
-	# kernel halts there during switch
 	# Set MPP=0 (U-mode), MPIE=1, SPIE=1
-	li t0, (0b11 << 11) | (1 << 7) | (1 << 5)
+	li t0, (0b00 << 11) | (1 << 7) | (1 << 5)
 	csrw mstatus, t0
 
 	# a1 - program counter
@@ -244,7 +242,7 @@ switch_to_user:
 	la t0, interrupt_handler
 	csrw mtvec, t0
 
-	# When an interrupt or exception occurs in M-mode, control
+	# # When an interrupt or exception occurs in M-mode, control
 	# will transfer to the address specified in mtvec
 	sfence.vma
 
@@ -256,8 +254,7 @@ switch_to_user:
 	#      A=TOR         X=1        W=1        R=1
 	li t0, (0b01 << 3) | (1 << 2) | (1 << 1) | (1 << 0)
 	csrw pmpcfg0, t0
-
-	# Set all 1's for the top address (exclusive)
+	# Set all 1 for the top address (exclusive)
 	# The bottom address (inclusive) is implicitly 0 when setting
 	# pmpcfg0 and pmpaddr0
 	li t0, -1
@@ -270,10 +267,16 @@ switch_to_user:
 		load_gp %i, t6
 		.set i, i + 1
 	.endr
+
 	.set i, 0
 	.rept NUM_FPU_REGS
 		load_fpu_regs %i
 		.set i, i + 1
 	.endr
+
+	# Enable FPU
+	li t0, 0x6000
+	csrs mstatus, t0
+
 	# Now jump to U-mode. Execution resumes in the user process.
 	mret
