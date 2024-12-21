@@ -2,6 +2,7 @@
 #define SV39_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 // MODE=8 encodes Sv39 paging in SATP register
 #define __mode_sv39 8

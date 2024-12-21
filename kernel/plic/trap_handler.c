@@ -1,5 +1,6 @@
 #include <stdint.h>
-#include "common/common.h"
+#include "devices/uart.h"
+#include "libc/stdio.h"
 #include "mm/sv39.h"
 #include "mm/page.h"
 #include "plic/trap_handler.h"
@@ -10,6 +11,7 @@
 #include "process/syscall.h"
 #include "process/sched.h"
 #include "process/process.h"
+#include "macro.h"
 
 // Handle only the following interrupts for now:
 //
@@ -50,7 +52,8 @@ size_t m_mode_trap_handler(size_t epc, size_t tval, size_t cause, size_t hart,
 				claim
 			);
 
-			uint8_t rcvd = uart_get();
+			// 
+			uint8_t rcvd = kgetchar();
 			switch (rcvd) {
 			case 3:
 				poweroff();

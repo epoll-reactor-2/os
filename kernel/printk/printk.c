@@ -1,6 +1,6 @@
 #include "printk/printk.h"
 #include "plic/cpu.h"
-#include "uart/uart.h"
+#include "libc/stdio.h"
 #include "config.h"
 #include <stdarg.h>
 

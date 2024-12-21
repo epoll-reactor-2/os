@@ -1,6 +1,6 @@
 #include "process/syscall.h"
-#include "common/common.h"
 #include "printk/printk.h"
+#include "macro.h"
 
 size_t do_syscall(size_t mepc, struct trap_frame *frame)
 {

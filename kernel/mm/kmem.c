@@ -1,8 +1,8 @@
 #include <stdbool.h>
-#include "common/common.h"
 #include "mm/kmem.h"
 #include "mm/page.h"
 #include "printk/printk.h"
+#include "macro.h"
 
 // Head of allocation. Start here when searching for free memory location
 static size_t *kmem_head = NULL;

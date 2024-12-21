@@ -1,6 +1,5 @@
 #include <stddef.h>
 #include "plic/cpu.h"
-#include "common/common.h"
 
 // Set timer interrupt to fire `us` microseconds from now
 void set_timer_interrupt_delay_us(size_t us)

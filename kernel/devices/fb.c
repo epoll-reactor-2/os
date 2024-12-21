@@ -1,7 +1,7 @@
 #include "devices/fb.h"
 #include <stdint.h>
 
-const uint8_t logo_bitmap_argb8888[] = {
+static const uint8_t logo_bitmap_argb8888[] = {
 #include "logo.argb8888"
 };
 

@@ -1,5 +1,5 @@
-#include "common/common.h"
 #include "devices/fb.h"
+#include "devices/uart.h"
 #include "mm/page.h"
 #include "mm/sv39.h"
 #include "mm/kmem.h"
@@ -10,8 +10,8 @@
 #include "process/process.h"
 #include "process/sched.h"
 #include "syscon/syscon.h"
-#include "uart/uart.h"
 #include "config.h"
+#include "macro.h"
 
 // Identity map range
 // Takes a contiguous allocation of memory and maps it using __page_size

@@ -1,58 +1,26 @@
-#include <stddef.h>
+#include "libc/stdio.h"
+#include "config.h"
+
+#if CONFIG_UART
+#include "devices/uart.h"
+#endif /* CONFIG_UART */
+
+#include "libc/ctype.h"
 #include <stdint.h>
-#include <stdarg.h>
+#include <stddef.h>
 #include <limits.h>
-#include "uart/uart.h"
-#include "common/common.h"
 
-/*
- * Initialize NS16550A UART
- */
-void uart_init(void)
+int kputchar(int c)
 {
-	volatile uint8_t *ptr = (uint8_t *) __uart_addr;
+#if CONFIG_UART
+	uart_put((uint8_t) c);
+#endif /* CONFIG_UART */
 
-	// Set word length to 8 (LCR[1:0])
-	const uint8_t lcr = 0b11;
-	ptr[3] = lcr;
+#if CONFIG_FB
+	
+#endif /* CONFIG_FB */
 
-	// Enable FIFO (FCR[0])
-	ptr[2] = 0b1;
-
-	// Enable receiver buffer interrupts (IER[0])
-	ptr[1] = 0b1;
-
-	// For a real UART, we need to compute and set the baud rate
-	// But since this is an emulated UART, we don't need to do anything
-	// 
-	// Assuming clock rate of 22.729 MHz, set signaling rate to 2400 baud
-	// divisor = ceil(CLOCK_HZ / (16 * BAUD_RATE))
-	// = ceil(22729000 / (16 * 2400))
-	// = 592
-	// 
-	// uint16_t divisor = 592;
-	// uint8_t divisor_least = divisor & 0xFF;
-	// uint8_t divisor_most = divisor >> 8;
-	// ptr[3] = LCR | 0x80;
-	// ptr[0] = divisor_least;
-	// ptr[1] = divisor_most;
-	// ptr[3] = LCR;
-}
-
-static void uart_put(uint8_t c)
-{
-	*(uint8_t *) __uart_addr = c;
-}
-
-uint8_t uart_get(void)
-{
-	return *(uint8_t *) __uart_addr;
-}
-
-int kputchar(int character)
-{
-	uart_put((uint8_t) character);
-	return character;
+	return c;
 }
 
 static void kprint(const char *str)
@@ -89,6 +57,8 @@ static void print_number(uint64_t n, int base, int uppercase)
 	while (p != buf)
 		kputchar(*--p);
 }
+
+#define __to_hex_digit(n) ('0' + (n) + ((n) < 10 ? 0 : 'a' - '0' - 10))
 
 static void print_number_hex(uint64_t n, int base, int uppercase)
 {
@@ -284,4 +254,11 @@ void kprintf(const char *format, ...)
 	va_start(arg, format);
 	kvprintf(format, arg);
 	va_end(arg);
+}
+
+int kgetchar(void)
+{
+#if CONFIG_UART
+	return uart_get();
+#endif /* CONFIG_UART */
 }

@@ -1,9 +1,9 @@
 #include <stddef.h>
-#include "common/common.h"
 #include "mm/kmem.h"
 #include "process/process.h"
 #include "process/sched.h"
 #include "printk/printk.h"
+#include "macro.h"
 
 static struct process_ll *processes = NULL;
 

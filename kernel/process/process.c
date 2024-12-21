@@ -1,9 +1,9 @@
-#include "common/common.h"
 #include "mm/kmem.h"
 #include "mm/page.h"
 #include "mm/sv39.h"
 #include "process/process.h"
 #include "process/syscall.h"
+#include "macro.h"
 
 extern const size_t MAKE_SYSCALL;
 
