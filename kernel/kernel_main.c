@@ -1,15 +1,16 @@
-#include "uart/uart.h"
-#include "syscon/syscon.h"
 #include "common/common.h"
-#include "printk/printk.h"
+#include "devices/fb.h"
 #include "mm/page.h"
 #include "mm/sv39.h"
 #include "mm/kmem.h"
 #include "plic/trap_frame.h"
 #include "plic/cpu.h"
 #include "plic/plic.h"
+#include "printk/printk.h"
 #include "process/process.h"
 #include "process/sched.h"
+#include "syscon/syscon.h"
+#include "uart/uart.h"
 #include "config.h"
 
 // Identity map range
@@ -82,7 +83,7 @@ void kernel_main(void)
 	__plic_enable(__plic_uart);
 	__plic_set_prio(__plic_uart, 1);
 
-
+	fb_init(__fb_w, __fb_h, __fb_depth);
 	printk("Initializing the process scheduler ...\n");
 	sched_init();
 
