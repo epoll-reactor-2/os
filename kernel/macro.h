@@ -4,6 +4,8 @@
 #include "plic/cpu.h"
 #include "printk/printk.h"
 
+#define __section(x) __attribute__ ((section (x)))
+
 #define __halt() ({                                    \
        __set_mie(0);                                   \
        asm volatile ("wfi");                           \
