@@ -20,7 +20,10 @@ OBJ = $(patsubst %.c,$(BUILD_DIR)/%.o,$(SRC))
 # Format
 INDENT_FLAGS = -linux -brf -i2
 
-all: dir $(KERNEL_IMAGE)
+all: dir fonts $(KERNEL_IMAGE)
+
+fonts:
+	make -C scripts
 
 dir:
 	@mkdir -p $(BUILD_DIR)

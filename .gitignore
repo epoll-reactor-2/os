@@ -2,3 +2,4 @@
 kernel.riscv64
 .config
 *.dtb
+**/__pycache__
