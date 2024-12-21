@@ -74,7 +74,6 @@ int main(int argc, char **argv)
 	for (int y = 0; y < height; ++y) {
 		for (int x = 0; x < width; ++x) {
 			unsigned char value = g->bitmap.buffer[y * width + x];
-			uint32_t alpha = value; // Grayscale value becomes alpha
 			bitmap[y * width + x] = value == 0 ? 0 : 0x00FFFFFF;
 		}
 	}
@@ -83,4 +82,5 @@ int main(int argc, char **argv)
 
 	free(bitmap);
 	FT_Done_Face(face);
+	FT_Done_FreeType(ft);
 }
