@@ -10,15 +10,22 @@ LINKER_SCRIPT = kernel/lds/riscv64-virt.ld
 BUILD_DIR = os.release.riscv
 KERNEL_IMAGE = $(BUILD_DIR)/kernel.riscv64
 
+CFLAGS += -I $(BUILD_DIR)/src
+
 # QEMU
 QEMU = qemu-system-riscv64
 MACH = virt
 
-SRC = $(shell find kernel misc -name '*.c')
+SRC = \
+	$(shell find kernel misc -name '*.c') \
+	$(BUILD_DIR)/src/font_dos_vga_437.c \
+	# We add generated targets before them \
+	# actually were generated. Used to simplify \
+	# Makefile logic.
+
 OBJ = $(patsubst %.c,$(BUILD_DIR)/%.o,$(SRC))
 
-# Format
-INDENT_FLAGS = -linux -brf -i2
+export
 
 all: dir fonts $(KERNEL_IMAGE)
 

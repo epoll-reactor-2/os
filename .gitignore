@@ -1,5 +1,7 @@
 **/*.o
-kernel.riscv64
+**/.gdb_history
+os.release*
 .config
 *.dtb
 **/__pycache__
+scripts/font_*

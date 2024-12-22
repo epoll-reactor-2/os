@@ -5,6 +5,10 @@
 #include "devices/uart.h"
 #endif /* CONFIG_UART */
 
+#if CONFIG_FB
+#include "devices/fb.h"
+#endif /* CONFIG_FB */
+
 #include "libc/ctype.h"
 #include <stdint.h>
 #include <stddef.h>
@@ -17,7 +21,7 @@ int kputchar(int c)
 #endif /* CONFIG_UART */
 
 #if CONFIG_FB
-	
+	fb_put((char) c);
 #endif /* CONFIG_FB */
 
 	return c;
