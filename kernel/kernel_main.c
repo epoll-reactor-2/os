@@ -75,7 +75,7 @@ void kernel_main(void)
 
 	printk_intro();
 
-#if !CONFIG_FPU
+#if CONFIG_FPU
 	printk("FPU test: %f\n", 1.23 / 0.00000000000000001);
 #endif /* CONFIG_FPU */
 
@@ -83,7 +83,9 @@ void kernel_main(void)
 	__plic_enable(__plic_uart);
 	__plic_set_prio(__plic_uart, 1);
 
+#if CONFIG_FB
 	fb_init(__fb_w, __fb_h, __fb_depth);
+#endif /* CONFIG_FB */
 	printk("Initializing the process scheduler ...\n");
 	sched_init();
 

@@ -1,4 +1,5 @@
 #include "devices/fb.h"
+#include "libc/string.h"
 #include "macro.h"
 #include <stdint.h>
 #include "font_dos_vga_437.h"
@@ -37,6 +38,20 @@ static void logo(struct framebuffer *fb)
 			}
 }
 
+/* Slow as fuck. */
+static inline void rotate()
+{
+	size_t line_size = fb.w * __font_dos_vga_437_h * fb.depth;
+
+	for (size_t i = 0; i < (fb.h - __font_dos_vga_437_h) * fb.w * fb.depth; ++i)
+		fb.buf[i] = fb.buf[i + line_size];
+
+	size_t last_line = (fb.h - __font_dos_vga_437_h) * fb.w * fb.depth;
+
+	for (size_t i = last_line; i < fb.h * fb.w * fb.depth; ++i)
+		fb.buf[i] = 0x00000000;
+}
+
 static inline void render_letter(char letter)
 {
 	static int x_off = 0;
@@ -62,12 +77,12 @@ static inline void render_letter(char letter)
 	x_off += __font_dos_vga_437_w + (__letter_off * fb.depth);
 
 	if (letter == '\n') {
-		y_off += __font_size;
+		if (y_off <= (fb.h - (__font_dos_vga_437_h * 2)))
+			y_off += __font_size;
+		else
+			rotate();
 		x_off = 0;
 	}
-
-	if (y_off >= __fb_h)
-		y_off = 0;
 }
 
 void fb_put(char c)
@@ -85,13 +100,6 @@ void fb_init(int w, int h, int depth)
 	for (int i = 0; i < w * h * depth; i += depth) {
 		volatile uint32_t *p = (volatile uint32_t *) &fb.buf[i];
 
-		*p = 0x00101010;
-	}
-
-	const char *txt = "[kernel panic]:\nmemory region 0x000000000";
-
-	while (*txt) {
-		render_letter(*txt);
-		++txt;
+		*p = 0x00000000;
 	}
 }
