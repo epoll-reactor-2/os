@@ -3,9 +3,8 @@
 #include "printk/printk.h"
 #include "macro.h"
 
-extern const size_t HEAP_START;
-extern const size_t HEAP_SIZE;
-extern const size_t HEAP_END;
+extern const size_t __heap_start;
+extern const size_t __heap_size;
 
 static size_t heap_bottom = 0;
 static size_t num_pages   = 0;
@@ -33,8 +32,8 @@ static size_t page_address_from_id(size_t id)
 // Initialize the heap for page allocation
 void page_init(void)
 {
-	heap_bottom = HEAP_START;
-	num_pages = HEAP_SIZE / __page_size;
+	heap_bottom = __heap_start;
+	num_pages = __heap_size / __page_size;
 	struct page *ptr = (struct page *)heap_bottom;
 	// Explicitly mark all pages as free
 	for (size_t i = 0; i < num_pages; ++i)
@@ -46,9 +45,9 @@ void page_init(void)
 
 	// Re-compute alloc_end and num_pages as the heap should not
 	// extend beyond our memory region
-	size_t error = alloc_end - (heap_bottom + HEAP_SIZE);
+	size_t error = alloc_end - (heap_bottom + __heap_size);
 	num_pages -= error / __page_size;
-	alloc_end = heap_bottom + HEAP_SIZE;
+	alloc_end = heap_bottom + __heap_size;
 
 	__assert(
 		page_address_from_id(num_pages) <= alloc_end,
@@ -116,9 +115,9 @@ void dealloc_pages(void *ptr)
 	size_t addr = heap_bottom + ((size_t)ptr - alloc_start) / __page_size;
 
 	__assert(
-		heap_bottom <= addr && addr < heap_bottom + HEAP_SIZE,
+		heap_bottom <= addr && addr < heap_bottom + __heap_size,
 		"dealloc_pages(): Variable addr = %p outside heap range [%p, %p)",
-		addr, heap_bottom, heap_bottom + HEAP_SIZE
+		addr, heap_bottom, heap_bottom + __heap_size
 	);
 
 	// Keep clearing pages until we hit the last page

@@ -16,39 +16,39 @@ SECTIONS {
         * it never happens
         */
         .init : ALIGN(4K) {
-                PROVIDE(__init_start = .);
+                PROVIDE(__ld_init_start = .);
                 *(.init);
-                PROVIDE(__init_end = .);
+                PROVIDE(__ld_init_end = .);
         }
 
         .text : ALIGN(4K) {
-                PROVIDE(__text_start = .);
+                PROVIDE(__ld_text_start = .);
                 *(.text);
-                PROVIDE(__text_end = .);
+                PROVIDE(__ld_text_end = .);
         }
 
         .rodata : ALIGN(4K) {
-                PROVIDE(__rodata_start = .);
+                PROVIDE(__ld_rodata_start = .);
                 *(.rodata);
-                PROVIDE(__rodata_end = .);
+                PROVIDE(__ld_rodata_end = .);
         }
 
         .data : ALIGN(4K) {
-                PROVIDE(__data_start = .);
+                PROVIDE(__ld_data_start = .);
                 *(.data);
-                PROVIDE(__data_end = .);
+                PROVIDE(__ld_data_end = .);
         }
 
         .bss : ALIGN(4K) {
-                PROVIDE(__bss_start = .);
+                PROVIDE(__ld_bss_start = .);
                 *(.bss);
-                PROVIDE(__bss_end = .);
+                PROVIDE(__ld_bss_end = .);
         }
 
-        PROVIDE(__global_pointer = .);
-        PROVIDE(__heap_start = .);
+        PROVIDE(__ld_global_pointer = .);
+        PROVIDE(__ld_heap_start = .);
         . = 0x88000000;
-        PROVIDE(__kernel_stack_start = . - 0x80000);
-        PROVIDE(__kernel_stack_end = .);
-        PROVIDE(__heap_size = __kernel_stack_start - __heap_start);
+        PROVIDE(__ld_kernel_stack_start = . - 0x80000);
+        PROVIDE(__ld_kernel_stack_end = .);
+        PROVIDE(__ld_heap_size = __ld_kernel_stack_start - __ld_heap_start);
 }

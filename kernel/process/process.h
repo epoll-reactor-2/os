@@ -39,13 +39,13 @@ enum {
 // of each field since we might need to access them
 // in assembly
 struct process {
-	struct 		trap_frame *frame;	// process[535:0]
-	void 		*stack;			// process[543:536]
-	size_t 		pc;			// process[551:544]
-	uint16_t 	pid;			// process[553:552]
-	struct 		page_table *root;	// process[567:560]
-	size_t 		state;			// process[575:568]
-	size_t 		sleep_until;		// process[583:576]
+	struct trap_frame 	*frame;		// process[535:0]
+	void 			*stack;		// process[543:536]
+	size_t 			pc;		// process[551:544]
+	uint16_t 		pid;		// process[553:552]
+	struct page_table 	*pages;		// process[567:560]
+	size_t 			state;		// process[575:568]
+	size_t 			sleep_until;	// process[583:576]
 };
 
 // Create a new process from function pointer

@@ -98,9 +98,6 @@ void kernel_main(void)
 	sched_enqueue(process_init);
 	sched_enqueue(process_init);
 	sched_enqueue(process_init);
-	sched_enqueue(process_init);
-	sched_enqueue(process_init);
-	sched_enqueue(process_init);
 
 	sched_print_ptree();
 

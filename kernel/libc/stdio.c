@@ -217,13 +217,45 @@ void kvprintf(const char *format, va_list arg)
 			}
 			case 'x': {
 				unsigned n = va_arg(arg, unsigned);
+
+				int neg = n < 0;
+
+				if (neg) {
+					kputchar('-');
+					n = ~n + 1;
+				}
+
+				int abs_n = neg ? -n : n;
+				int len = number_len(abs_n, 10) + (neg ? 1 : 0);
+				int padding = (width > len) ? (width - len) : 0;
+
 				print_number(n, /* base */ 16, /* uppercase */ 0);
+
+				while (padding-- > 0)
+					kputchar(' ');
+
 				break;
 			}
 
 			case 'X': {
 				unsigned n = va_arg(arg, unsigned);
+
+				int neg = n < 0;
+
+				if (neg) {
+					kputchar('-');
+					n = ~n + 1;
+				}
+
+				int abs_n = neg ? -n : n;
+				int len = number_len(abs_n, 10) + (neg ? 1 : 0);
+				int padding = (width > len) ? (width - len) : 0;
+
 				print_number(n, /* base */ 16, /* uppercase */ 1);
+
+				while (padding-- > 0)
+					kputchar(' ');
+
 				break;
 			}
 			case 'c':

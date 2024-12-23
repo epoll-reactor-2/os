@@ -38,21 +38,21 @@ void map(struct page_table *root, size_t vaddr, size_t paddr, uint64_t bits,
 		"map(): level = %d is outside range [0, 3) permitted by Sv39", level
 	);
 
-	// Extract virtual page number (VPN) fields from virtual address
-	const size_t VPN[3] = {
-		(vaddr >> 12) & 0x1FF,		/* VPN[0] = vaddr[20:12] */
-		(vaddr >> 21) & 0x1FF,		/* VPN[1] = vaddr[29:21] */
-		(vaddr >> 30) & 0x1FF		/* VPN[2] = vaddr[38:30] */
+	// Extract virtual page number (vpn) fields from virtual address
+	const size_t vpn[3] = {
+		(vaddr >> 12) & 0x1FF,		/* vpn[0] = vaddr[20:12] */
+		(vaddr >> 21) & 0x1FF,		/* vpn[1] = vaddr[29:21] */
+		(vaddr >> 30) & 0x1FF		/* vpn[2] = vaddr[38:30] */
 	};
 
-	// Extract physical page number (PPN) fields from physical address
-	const size_t PPN[3] = {
-		(paddr >> 12) & 0x1FF,		/* PPN[0] = paddr[20:12] */
-		(paddr >> 21) & 0x1FF,		/* PPN[1] = paddr[29:21] */
-		(paddr >> 30) & 0x3FFFFFF	/* PPN[2] = paddr[55:30] */
+	// Extract physical page number (ppn) fields from physical address
+	const size_t ppn[3] = {
+		(paddr >> 12) & 0x1FF,		/* ppn[0] = paddr[20:12] */
+		(paddr >> 21) & 0x1FF,		/* ppn[1] = paddr[29:21] */
+		(paddr >> 30) & 0x3FFFFFF	/* ppn[2] = paddr[55:30] */
 	};
 
-	uint64_t *pte = &root->entries[VPN[2]];
+	uint64_t *pte = &root->entries[vpn[2]];
 
 	for (int i = 1; i >= level; --i) {
 		if (__pte_is_invalid(*pte)) {
@@ -61,12 +61,12 @@ void map(struct page_table *root, size_t vaddr, size_t paddr, uint64_t bits,
 		}
 
 		uint64_t *entry = (uint64_t *) ((*pte & ~0x3FFull) << 2);
-		pte = &entry[VPN[i]];
+		pte = &entry[vpn[i]];
 	}
 
-	*pte = (PPN[2] << 28)	/* PPN[2] = PTE[53:28] */
-	     | (PPN[1] << 19)	/* PPN[1] = PTE[27:19] */
-	     | (PPN[0] << 10)	/* PPN[0] = PTE[18:10] */
+	*pte = (ppn[2] << 28)	/* ppn[2] = PTE[53:28] */
+	     | (ppn[1] << 19)	/* ppn[1] = PTE[27:19] */
+	     | (ppn[0] << 10)	/* ppn[0] = PTE[18:10] */
 	     | bits
 	     | __pte_valid;
 }
@@ -113,13 +113,13 @@ size_t virt_to_phys(struct page_table const *root, size_t vaddr)
 	__assert(root != NULL, "virt_to_phys(): root should not be NULL");
 	__assert(vaddr != 0, "virt_to_phys(): virtual address should not be 0");
 
-	const size_t VPN[3] = {
-		(vaddr >> 12) & 0x1FF,	/* VPN[2] = vaddr[38:30] */
-		(vaddr >> 21) & 0x1FF,	/* VPN[0] = vaddr[20:12] */
-		(vaddr >> 30) & 0x1FF	/* VPN[1] = vaddr[29:21] */
+	const size_t vpn[3] = {
+		(vaddr >> 12) & 0x1FF,	/* vpn[2] = vaddr[38:30] */
+		(vaddr >> 21) & 0x1FF,	/* vpn[0] = vaddr[20:12] */
+		(vaddr >> 30) & 0x1FF	/* vpn[1] = vaddr[29:21] */
 	};
 
-	uint64_t pte = root->entries[VPN[2]];
+	uint64_t pte = root->entries[vpn[2]];
 
 	for (int i = 2; i >= 0; --i) {
 		if (__pte_is_invalid(pte))
@@ -139,7 +139,7 @@ size_t virt_to_phys(struct page_table const *root, size_t vaddr)
 		}
 
 		const uint64_t *entry = (const uint64_t *)((pte & ~0x3FFull) << 2);
-		pte = entry[VPN[i - 1]];
+		pte = entry[vpn[i - 1]];
 	}
 
 	// No valid mapping at this point - return 0

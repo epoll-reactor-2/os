@@ -32,54 +32,54 @@
 
 # Importation of linker symbols
 .section .rodata
-.global HEAP_START
-HEAP_START: .dword __heap_start
+.global __heap_start
+__heap_start: .dword __ld_heap_start
 
-.global HEAP_SIZE
-HEAP_SIZE: .dword __heap_size
+.global __heap_size
+__heap_size: .dword __ld_heap_size
 
-.global INIT_START
-INIT_START: .dword __init_start
+.global __init_start
+__init_start: .dword __ld_init_start
 
-.global INIT_END
-INIT_END: .dword __init_end
+.global __init_end
+__init_end: .dword __ld_init_end
 
-.global TEXT_START
-TEXT_START: .dword __text_start
+.global __text_start
+__text_start: .dword __ld_text_start
 
-.global TEXT_END
-TEXT_END: .dword __text_end
+.global __text_end
+__text_end: .dword __ld_text_end
 
-.global RODATA_START
-RODATA_START: .dword __rodata_start
+.global __rodata_start
+__rodata_start: .dword __ld_rodata_start
 
-.global RODATA_END
-RODATA_END: .dword __rodata_end
+.global __rodata_end
+__rodata_end: .dword __ld_rodata_end
 
-.global DATA_START
-DATA_START: .dword __data_start
+.global __data_start
+__data_start: .dword __ld_data_start
 
-.global DATA_END
-DATA_END: .dword __data_end
+.global __data_end
+__data_end: .dword __ld_data_end
 
-.global BSS_START
-BSS_START: .dword __bss_start
+.global __bss_start
+__bss_start: .dword __ld_bss_start
 
-.global BSS_END
-BSS_END: .dword __bss_end
+.global __bss_end
+__bss_end: .dword __ld_bss_end
 
-.global KERNEL_STACK_START
-KERNEL_STACK_START: .dword __kernel_stack_start
+.global __kernel_stack_start
+__kernel_stack_start: .dword __ld_kernel_stack_start
 
-.global KERNEL_STACK_END
-KERNEL_STACK_END: .dword __kernel_stack_end
+.global __kernel_stack_end
+__kernel_stack_end: .dword __ld_kernel_stack_end
 
-.global MAKE_SYSCALL
-MAKE_SYSCALL: .dword make_syscall
+.global __make_syscall
+__make_syscall: .dword make_syscall
 
 .section .data
-.global KERNEL_TABLE
-KERNEL_TABLE: .dword 0
+.global __kernel_table
+__kernel_table: .dword 0
 
 .section .init, "ax"
 .global _start
@@ -120,11 +120,11 @@ __bss_zero_loop_end:
 	# Initialize global pointer register
 	.option push
 	.option norelax
-	la gp, __global_pointer
+	la gp, __ld_global_pointer
 	.option pop
 
 	# Initialize stack and frame pointer registers
-	la sp, __kernel_stack_end
+	la sp, __ld_kernel_stack_end
 	mv fp, sp
 
 	# If kernel_main returns, we're done with everything so halt forever
@@ -188,7 +188,7 @@ interrupt_handler:
 	# Best practice is probably to allocate a page for
 	# dedicated use as the trap stack, but using the kernel
 	# stack directly seems to work for now
-	la sp, __kernel_stack_end
+	la sp, __ld_kernel_stack_end
 	call m_mode_trap_handler
 
 	# m_mode_trap_handler returns the PC value via a0
