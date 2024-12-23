@@ -18,7 +18,14 @@ size_t do_syscall(size_t mepc, struct trap_frame *frame)
 	case __syscall_test:
 		printk("process stack: %x\n", &a);
 		printk("process stack: %x\n", &b);
-		printk("__syscall_test()\n");
+		printk("__syscall\t_test()\n");
+		printk("__syscall1\t_test()\n");
+		printk("__syscall11\t_test()\n");
+		printk("__syscall111\t_test()\n");
+		printk("__syscall1111\t_test()\n");
+		printk("__syscall11111\t_test()\n");
+		printk("__syscall111111\t_test()\n");
+		printk("__syscall1111111\t_test()\n");
 		return mepc + 4;
 
 	default:

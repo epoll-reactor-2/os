@@ -5,6 +5,7 @@
 #include "printk/printk.h"
 
 #define __section(x) __attribute__ ((section (x)))
+#define __aligned(x) __attribute__ ((aligned (x)))
 
 #define __halt() ({                                    \
        __set_mie(0);                                   \

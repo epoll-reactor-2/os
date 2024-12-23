@@ -13,6 +13,7 @@ static const uint8_t logo_bitmap_argb8888[] = {
 #define __bitmap_h	121
 #define __font_size	 24
 #define __letter_off	 10
+#define __tab_w		  8
 #define __bg		0x00000000
 
 struct framebuffer {
@@ -39,13 +40,20 @@ static void logo(struct framebuffer *fb)
 			}
 }
 
-/* Slow as fuck. */
 static inline void rotate()
 {
-	size_t line_size = fb.w * __font_dos_vga_437_h * fb.depth;
+	uint64_t    line_w =  fb.w * __font_dos_vga_437_h * fb.depth;
+	uint64_t     total = (fb.h - __font_dos_vga_437_h) * fb.w * fb.depth;
+	uint64_t   aligned = total & ~0x15;
+	uint64_t         i = 0;
 
-	for (size_t i = 0; i < (fb.h - __font_dos_vga_437_h) * fb.w * fb.depth; ++i)
-		fb.buf[i] = fb.buf[i + line_size];
+	for (; i < aligned; i += 16) {
+		*(volatile uint64_t *) (fb.buf + i    ) = *(volatile uint64_t *) (fb.buf + i     + line_w);
+		*(volatile uint64_t *) (fb.buf + i + 8) = *(volatile uint64_t *) (fb.buf + i + 8 + line_w);
+	}
+
+	for (; i < total; ++i)
+		fb.buf[i] = fb.buf[i + line_w];
 
 	size_t last_line = (fb.h - __font_dos_vga_437_h) * fb.w * fb.depth;
 
@@ -53,12 +61,32 @@ static inline void rotate()
 		fb.buf[i] = __bg;
 }
 
+static inline void render_visible(int start, int *x_off, int *y_off)
+{
+	int letter_off = __font_dos_vga_437_w + (__letter_off * fb.depth);
+
+	for (int y = 0; y < __font_dos_vga_437_h; ++y) {
+		for (int x = 0; x < __font_dos_vga_437_w; ++x) {
+			uint32_t byte  = font_dos_vga_437[start + (y * __font_dos_vga_437_w + x)];
+
+			/* This will allow to easily change background color. */
+			if (byte == __bg)
+				continue;
+
+			uint32_t off = *x_off + ((y + *y_off) * fb.w + x) * fb.depth;
+
+			uint32_t *__fb = (uint32_t *) &fb.buf[off];
+			*__fb = byte;
+
+		}
+	}
+
+	*x_off += letter_off;
+}
+
 static void render_letter(char letter)
 {
-
-	int siz        = __font_dos_vga_437_w * __font_dos_vga_437_h;
-	int start      = siz * (letter - __font_dos_vga_437_start);
-	int letter_off = __font_dos_vga_437_w + (__letter_off * fb.depth);
+	int siz = __font_dos_vga_437_w * __font_dos_vga_437_h;
 
 	static int x_off = 0;
 	static int y_off = 0;
@@ -71,29 +99,24 @@ static void render_letter(char letter)
 			rotate();
 		x_off = 0;
 		break;
+	case '\t': {
+		int letter_off = __font_dos_vga_437_w + (__letter_off * fb.depth);
+		/* Tab consists of spaces. */
+		int start = siz * (' ' - __font_dos_vga_437_start);
+
+		for (int i = 0; i < (x_off / letter_off) % __tab_w; ++i)
+			render_visible(start, &x_off, &y_off);
+		break;
+	}
 	case '\r':
 		x_off = 0;
 		break;
-	default:
-		for (int y = 0; y < __font_dos_vga_437_h; ++y) {
-			for (int x = 0; x < __font_dos_vga_437_w; ++x) {
-				uint32_t byte  = font_dos_vga_437[start + (y * __font_dos_vga_437_w + x)];
-
-				/* This will allow to easily change background color. */
-				if (byte == __bg)
-					continue;
-
-				uint32_t off = x_off + ((y + y_off) * fb.w + x) * fb.depth;
-
-				uint32_t *__fb = (uint32_t *) &fb.buf[off];
-				*__fb = byte;
-
-			}
-		}
-
-		x_off += letter_off;
+	default: {
+		int start = siz * (letter - __font_dos_vga_437_start);
+		render_visible(start, &x_off, &y_off);
 		break;
 	}
+	} /* switch */
 }
 
 void fb_put(char c)
