@@ -140,13 +140,13 @@ void dealloc_pages(void *ptr)
 
 void print_page_allocations(void)
 {
-	struct page *ptr = (struct page *)heap_bottom;
+	struct page *ptr = (struct page *) heap_bottom;
 	size_t total = 0;
-	size_t TOTAL_BYTES = num_pages * __page_size;
+	size_t total_bytes = num_pages * __page_size;
 
 	printk("Page allocation table\n");
 	printk("_________________________________________________\n");
-	printk("|   Total usable memory: %d pages (%d bytes)\n", num_pages, TOTAL_BYTES);
+	printk("|   Total usable memory: %d pages (%d bytes)\n", num_pages, total_bytes);
 	printk("|   Metadata:            [%p, %p)\n", ptr, &ptr[num_pages]);
 	printk("|   Pages:               [%p, %p)\n", alloc_start, alloc_end);
 	printk("|________________________________________________\n");
@@ -185,7 +185,7 @@ void print_page_allocations(void)
 	printk("|\n");
 	printk("|   Total allocated: %d pages (%d bytes)\n", total, ALLOC_BYTES);
 	printk("|   Total free:      %d pages (%d bytes)\n", num_pages - total,
-		TOTAL_BYTES - ALLOC_BYTES);
+		total_bytes - ALLOC_BYTES);
 	printk("|________________________________________________\n");
 	printk("\n");
 }

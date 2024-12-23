@@ -95,9 +95,9 @@ void kernel_main(void)
 	print_page_allocations();
 
 	printk("Adding few processes to scheduler ...\n");
-	sched_enqueue(process_init);
-	sched_enqueue(process_init);
-	sched_enqueue(process_init);
+	sched_enqueue(process_init, "process 1");
+	sched_enqueue(process_init, "process 2");
+	sched_enqueue(process_init, "process 3");
 
 	sched_print_ptree();
 

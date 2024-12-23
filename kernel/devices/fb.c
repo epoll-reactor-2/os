@@ -44,12 +44,18 @@ static inline void rotate()
 {
 	uint64_t    line_w =  fb.w * __font_dos_vga_437_h * fb.depth;
 	uint64_t     total = (fb.h - __font_dos_vga_437_h) * fb.w * fb.depth;
-	uint64_t   aligned = total & ~0x15;
+	uint64_t   aligned = total & ~0x63;
 	uint64_t         i = 0;
 
-	for (; i < aligned; i += 16) {
-		*(volatile uint64_t *) (fb.buf + i    ) = *(volatile uint64_t *) (fb.buf + i     + line_w);
-		*(volatile uint64_t *) (fb.buf + i + 8) = *(volatile uint64_t *) (fb.buf + i + 8 + line_w);
+	for (; i < aligned; i += 64) {
+		*(uint64_t *) (fb.buf + i + (8 *  0)) = *(uint64_t *) (fb.buf + i + (8 *  0) + line_w);
+		*(uint64_t *) (fb.buf + i + (8 *  1)) = *(uint64_t *) (fb.buf + i + (8 *  1) + line_w);
+		*(uint64_t *) (fb.buf + i + (8 *  2)) = *(uint64_t *) (fb.buf + i + (8 *  2) + line_w);
+		*(uint64_t *) (fb.buf + i + (8 *  3)) = *(uint64_t *) (fb.buf + i + (8 *  3) + line_w);
+		*(uint64_t *) (fb.buf + i + (8 *  4)) = *(uint64_t *) (fb.buf + i + (8 *  4) + line_w);
+		*(uint64_t *) (fb.buf + i + (8 *  5)) = *(uint64_t *) (fb.buf + i + (8 *  5) + line_w);
+		*(uint64_t *) (fb.buf + i + (8 *  6)) = *(uint64_t *) (fb.buf + i + (8 *  6) + line_w);
+		*(uint64_t *) (fb.buf + i + (8 *  7)) = *(uint64_t *) (fb.buf + i + (8 *  7) + line_w);
 	}
 
 	for (; i < total; ++i)
@@ -67,7 +73,7 @@ static inline void render_visible(int start, int *x_off, int *y_off)
 
 	for (int y = 0; y < __font_dos_vga_437_h; ++y) {
 		for (int x = 0; x < __font_dos_vga_437_w; ++x) {
-			uint32_t byte  = font_dos_vga_437[start + (y * __font_dos_vga_437_w + x)];
+			uint32_t byte = font_dos_vga_437[start + (y * __font_dos_vga_437_w + x)];
 
 			/* This will allow to easily change background color. */
 			if (byte == __bg)

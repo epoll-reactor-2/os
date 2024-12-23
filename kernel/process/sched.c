@@ -13,14 +13,14 @@ void sched_init(void)
 		"sched_init(): should only be called once at system startup\n");
 }
 
-void sched_enqueue(void (*func)(void))
+void sched_enqueue(void (*func)(void), const char *name)
 {
 	struct process_ll *nd = kmalloc(sizeof(struct process_ll));
 
 	__assert(nd != NULL,
 		"sched_enqueue(): failed to allocate linked list node for new process\n");
 
-	nd->process = process_create(func);
+	nd->process = process_create(func, name);
 
 	if (processes == NULL) {
 		nd->prev = nd;
@@ -59,10 +59,12 @@ void sched_print_ptree()
 	struct process_ll *current = processes;
 
 	do {
-		printk("|  PID %d\n", current->process->pid);
+		printk("|  name:            %s\n", current->process->name);
+		printk("|  PID:             %d\n", current->process->pid);
+		printk("|  state:           %s\n", process_state_string(current->process->state));
+    	printk("_________________________________________________\n");
 		current = current->next;
 	} while (current != processes);
 
-	printk("|________________________________________________\n");
 	printk("\n");
 }

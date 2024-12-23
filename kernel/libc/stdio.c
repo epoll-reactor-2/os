@@ -42,7 +42,7 @@ int kputs(const char *str)
 	return 0;
 }
 
-static void print_number(uint64_t n, int base, int uppercase)
+static inline void print_number(uint64_t n, int base, int uppercase)
 {
 	char buf[20] = {0};
 	char *p = buf;
@@ -62,30 +62,7 @@ static void print_number(uint64_t n, int base, int uppercase)
 		kputchar(*--p);
 }
 
-#define __to_hex_digit(n) ('0' + (n) + ((n) < 10 ? 0 : 'a' - '0' - 10))
-
-static void print_number_hex(uint64_t n, int base, int uppercase)
-{
-	char buf[20] = {0};
-	char *p = buf;
-	char lsh = __to_hex_digit(n % 16);
-	n /= base;
-
-	while (n) {
-		*p++ = __to_hex_digit(n % 16);
-		n /= base;
-	}
-
-	while (p != buf)
-		kputchar(*--p);
-
-	if (uppercase)
-		kputchar(toupper(lsh));
-	else
-		kputchar(lsh);
-}
-
-static size_t number_len(int64_t n, int base)
+static inline size_t number_len(int64_t n, int base)
 {
 	size_t len = (n == 0) ? 1 : 0;
 
@@ -100,7 +77,7 @@ static size_t number_len(int64_t n, int base)
 	return len;
 }
 
-static void print_float(double value, int precision)
+static inline void print_float(double value, int precision)
 {
 	if (value < 0) {
 		kputchar('-');

@@ -34,11 +34,24 @@ enum {
 	__process_dead 		= (1 << 3)
 };
 
+static inline const char *process_state_string(int state)
+{
+	switch (state) {
+	case __process_running:  return "running";
+	case __process_sleeping: return "sleeping";
+	case __process_waiting:  return "waiting";
+	case __process_dead:     return "dead";
+	default:
+		return "<unknown process state>";
+	}
+}
+
 // Process structure
 // We need to know the exact sizes and positions
 // of each field since we might need to access them
 // in assembly
 struct process {
+	char			name[32];
 	struct trap_frame 	*frame;		// process[535:0]
 	void 			*stack;		// process[543:536]
 	size_t 			pc;		// process[551:544]
@@ -49,7 +62,7 @@ struct process {
 };
 
 // Create a new process from function pointer
-struct process *process_create(void (*)(void));
+struct process *process_create(void (*)(void), const char *name);
 void            process_switch_to_user(struct process *process);
 
 // Defined in src/asm/crt0.s

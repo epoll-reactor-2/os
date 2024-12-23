@@ -8,6 +8,7 @@
 #define __fixed_h 	 20
 #define __ascii_start	 32
 #define __ascii_end	126
+#define __ascii_total	(__ascii_end - __ascii_start + 1)
 
 static inline int letter_off(char c)
 {
@@ -71,7 +72,7 @@ int main(int argc, char **argv)
 	fprintf(f, "#include \"%s.h\"\n\n", output_name);
 	fprintf(f, "\n");
 	fprintf(f, "const uint32_t %s[%d * %d * %d] = {\n",
-		output_name, __ascii_end - __ascii_start, __fixed_h, __fixed_w
+		output_name, __ascii_total, __fixed_h, __fixed_w
 	);
 
 	FT_Library ft;
@@ -143,7 +144,7 @@ int main(int argc, char **argv)
 	fprintf(f, "#define __%s_h     %d\n", output_name, __fixed_h);
 	fprintf(f, "\n");
 	fprintf(f, "extern const uint32_t %s[%d * %d * %d];\n",
-		output_name, __ascii_end - __ascii_start, __fixed_h, __fixed_w
+		output_name, __ascii_total, __fixed_h, __fixed_w
 	);
 	fprintf(f, "\n");
 	fprintf(f, "#endif /* __%s */\n", output_name);

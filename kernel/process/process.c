@@ -1,6 +1,7 @@
 #include "mm/kmem.h"
 #include "mm/page.h"
 #include "mm/sv39.h"
+#include "libc/string.h"
 #include "process/process.h"
 #include "process/syscall.h"
 #include "printk/printk.h"
@@ -16,14 +17,14 @@ static int __next_pid = 1;
 void process_init(void)
 {
 	while (1) {
-		for (size_t i = 0; i < 70000000; ++i)
+		for (size_t i = 0; i < 300000000; ++i)
 			;
 
 		make_syscall(1);
 	}
 }
 
-struct process *process_create(void (*func)(void))
+struct process *process_create(void (*func)(void), const char *name)
 {
 	size_t func_paddr = (size_t) func;	// determine process physical address
 	size_t func_vaddr = func_paddr;	// set process virtual address
@@ -31,10 +32,12 @@ struct process *process_create(void (*func)(void))
 	// Initialize process structure
 	struct process *process = kmalloc(sizeof (struct process));
 
+	strcpy(process->name, name);
+
 	__assert(process != NULL,
 		"process_create(): failed to allocate memory for process structure\n");
 
-	process->frame = (struct trap_frame *)alloc_page();
+	process->frame = (struct trap_frame *) alloc_page();
 	__assert(process->frame != NULL,
 		"process_create(): failed to allocate page for process context frame\n");
 
