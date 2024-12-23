@@ -59,8 +59,21 @@ static inline void render_letter(char letter)
 
 	for (int y = 0; y < __font_dos_vga_437_h; ++y) {
 		for (int x = 0; x < __font_dos_vga_437_w; ++x) {
-			uint32_t siz   = __font_dos_vga_437_w * __font_dos_vga_437_h;
-			uint32_t start = siz * (letter - __font_dos_vga_437_start);
+			/* These are not present in font bitmap and
+			   needs to be treated specially. */
+			switch (letter) {
+			case ' ':
+			case '\r':
+			case '\n':
+			case '\t':
+				continue;
+			default:
+				break;
+			}
+
+			int32_t siz   = __font_dos_vga_437_w * __font_dos_vga_437_h;
+			int32_t start = siz * (letter - __font_dos_vga_437_start);
+
 			uint32_t byte  = font_dos_vga_437[start + (y * __font_dos_vga_437_w + x)];
 
 			/* This will allow to easily change background color. */
