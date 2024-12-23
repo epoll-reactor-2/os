@@ -13,6 +13,7 @@ static const uint8_t logo_bitmap_argb8888[] = {
 #define __bitmap_h	121
 #define __font_size	 24
 #define __letter_off	 10
+#define __bg		0x00000000
 
 struct framebuffer {
 	volatile uint8_t	*buf;
@@ -49,52 +50,49 @@ static inline void rotate()
 	size_t last_line = (fb.h - __font_dos_vga_437_h) * fb.w * fb.depth;
 
 	for (size_t i = last_line; i < fb.h * fb.w * fb.depth; ++i)
-		fb.buf[i] = 0x00000000;
+		fb.buf[i] = __bg;
 }
 
-static inline void render_letter(char letter)
+static void render_letter(char letter)
 {
+
+	int siz        = __font_dos_vga_437_w * __font_dos_vga_437_h;
+	int start      = siz * (letter - __font_dos_vga_437_start);
+	int letter_off = __font_dos_vga_437_w + (__letter_off * fb.depth);
+
 	static int x_off = 0;
 	static int y_off = 0;
 
-	for (int y = 0; y < __font_dos_vga_437_h; ++y) {
-		for (int x = 0; x < __font_dos_vga_437_w; ++x) {
-			/* These are not present in font bitmap and
-			   needs to be treated specially. */
-			switch (letter) {
-			case ' ':
-			case '\r':
-			case '\n':
-			case '\t':
-				continue;
-			default:
-				break;
-			}
-
-			int32_t siz   = __font_dos_vga_437_w * __font_dos_vga_437_h;
-			int32_t start = siz * (letter - __font_dos_vga_437_start);
-
-			uint32_t byte  = font_dos_vga_437[start + (y * __font_dos_vga_437_w + x)];
-
-			/* This will allow to easily change background color. */
-			if (byte == 0x00000000)
-				continue;
-
-			uint32_t off = x_off + ((y + y_off) * fb.w + x) * fb.depth;
-
-			uint32_t *__fb = (uint32_t *) &fb.buf[off];
-			*__fb = byte;
-		}
-	}
-
-	x_off += __font_dos_vga_437_w + (__letter_off * fb.depth);
-
-	if (letter == '\n') {
+	switch (letter) {
+	case '\n':
 		if (y_off <= (fb.h - (__font_dos_vga_437_h * 2)))
 			y_off += __font_size;
 		else
 			rotate();
 		x_off = 0;
+		break;
+	case '\r':
+		x_off = 0;
+		break;
+	default:
+		for (int y = 0; y < __font_dos_vga_437_h; ++y) {
+			for (int x = 0; x < __font_dos_vga_437_w; ++x) {
+				uint32_t byte  = font_dos_vga_437[start + (y * __font_dos_vga_437_w + x)];
+
+				/* This will allow to easily change background color. */
+				if (byte == __bg)
+					continue;
+
+				uint32_t off = x_off + ((y + y_off) * fb.w + x) * fb.depth;
+
+				uint32_t *__fb = (uint32_t *) &fb.buf[off];
+				*__fb = byte;
+
+			}
+		}
+
+		x_off += letter_off;
+		break;
 	}
 }
 
@@ -113,6 +111,6 @@ void fb_init(int w, int h, int depth)
 	for (int i = 0; i < w * h * depth; i += depth) {
 		volatile uint32_t *p = (volatile uint32_t *) &fb.buf[i];
 
-		*p = 0x00000000;
+		*p = __bg;
 	}
 }

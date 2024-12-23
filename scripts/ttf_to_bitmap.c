@@ -6,8 +6,8 @@
 
 #define __fixed_w 	 12
 #define __fixed_h 	 20
-#define __ascii_start	 45
-#define __ascii_end	123
+#define __ascii_start	 32
+#define __ascii_end	126
 
 static inline int letter_off(char c)
 {
@@ -80,7 +80,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	for (int i = 45; i < 123; ++i) {
+	for (int i = __ascii_start; i <= __ascii_end; ++i) {
 		FT_Face face;
 		if (FT_New_Face(ft, font_file, 0, &face)) {
 			fprintf(stderr, "Could not load font: %s\n", font_file);
