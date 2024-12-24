@@ -70,10 +70,11 @@ static void printk_intro()
 void kernel_main(void)
 {
 	uart_init();
+	printk_intro();
+
 	page_init();
 	kmem_init();
 
-	printk_intro();
 
 	__plic_set_threshold(0);
 	__plic_enable(__plic_uart);
@@ -92,7 +93,7 @@ void kernel_main(void)
 
 	kmalloc(123);
 	kmem_print_table();
-	print_page_allocations();
+	page_print_allocation_table();
 
 	printk("Adding few processes to scheduler ...\n");
 	sched_enqueue(process_init, "process 1");

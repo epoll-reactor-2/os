@@ -56,7 +56,7 @@ void map(struct page_table *root, size_t vaddr, size_t paddr, uint64_t bits,
 
 	for (int i = 1; i >= level; --i) {
 		if (__pte_is_invalid(*pte)) {
-			void *page = alloc_page();
+			void *page = page_alloc();
 			*pte = ((uint64_t) page >> 2) | __pte_valid;
 		}
 
@@ -93,11 +93,11 @@ void unmap(struct page_table *root)
 
 				if (__pte_is_valid(entry_lv1) && __pte_is_branch(entry_lv1))
 					// We can't have branches in level 0, so free directly
-					dealloc_pages((void *)((entry_lv1 & ~0x3FFull) << 2));
+					pages_dealloc((void *)((entry_lv1 & ~0x3FFull) << 2));
 
 			}
 
-			dealloc_pages((void *)table_lv1);
+			pages_dealloc((void *)table_lv1);
 		}
 	}
 }

@@ -29,7 +29,7 @@ size_t kmem_get_num_allocations(void)
 // This memory must not be allocated to userspace processes!
 void kmem_init(void)
 {
-	void *k_alloc = alloc_pages(64);
+	void *k_alloc = page_alloc_many(64);
 
 	__assert(k_alloc != NULL,
 		"kmem_init(): got NULL pointer when requesting pages for kernel"
@@ -39,7 +39,7 @@ void kmem_init(void)
 	kmem_head = (size_t *) k_alloc;
 	__kmem_metadata_set_free(kmem_head);
 	__kmem_metadata_set_size(kmem_head, kmem_alloc * __page_size);
-	kmem_page_table = (struct page_table *)alloc_page();
+	kmem_page_table = (struct page_table *)page_alloc();
 
 	__assert(kmem_page_table != NULL,
 		"kmem_init(): got NULL pointer when requesting single page for kernel page table"

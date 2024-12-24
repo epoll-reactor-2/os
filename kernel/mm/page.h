@@ -13,14 +13,14 @@ struct page {
 	uint8_t flags;
 };
 
-size_t get_num_pages(void);
+size_t page_total(void);
 
 size_t align_val(size_t, size_t);
 
-void page_init(void);
-void *alloc_pages(size_t);
-void *alloc_page(void);
-void dealloc_pages(void *);
-void print_page_allocations(void);
+void  page_init(void);
+void *page_alloc_many(size_t);
+void *page_alloc(void);
+void  pages_dealloc(void *);
+void  page_print_allocation_table(void);
 
 #endif

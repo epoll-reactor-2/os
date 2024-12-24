@@ -11,7 +11,7 @@ static size_t num_pages   = 0;
 static size_t alloc_start = 0;
 static size_t alloc_end   = 0;
 
-size_t get_num_pages(void)
+size_t page_total(void)
 {
 	return num_pages;
 }
@@ -49,6 +49,12 @@ void page_init(void)
 	num_pages -= error / __page_size;
 	alloc_end = heap_bottom + __heap_size;
 
+	printk("page_init(): heap_bottom: 0x%x\n", heap_bottom);
+	printk("page_init(): num_pages:   %d\n", num_pages);
+	printk("page_init(): alloc_start: 0x%x\n", alloc_start);
+	printk("page_init(): alloc_end:   0x%x\n", alloc_end);
+	printk("page_init(): error:       0x%x\n", error);
+
 	__assert(
 		page_address_from_id(num_pages) <= alloc_end,
 		"page_init(): Heap extends beyond our available memory region!"
@@ -59,9 +65,9 @@ void page_init(void)
 // and returns a pointer to the beginning of the first page if successful
 // All allocated pages are automatically zeroed if successful
 // Otherwise, return NULL
-void *alloc_pages(size_t n)
+void *page_alloc_many(size_t n)
 {
-	__assert(n != 0, "alloc_pages(): attempted to allocate 0 pages");
+	__assert(n != 0, "page_alloc_many(): attempted to allocate 0 pages");
 	struct page *ptr = (struct page *)heap_bottom;
 
 	for (size_t i = 0; i + n < num_pages + 1; ++i) {
@@ -86,13 +92,13 @@ void *alloc_pages(size_t n)
 		// Zero memory for all `n` pages and return a pointer to
 		// the beginning of the 1st page
 		// Do it in chunks of size_t bytes for efficiency
-		size_t *result = (size_t *)page_address_from_id(i);
+		size_t *result = (size_t *) page_address_from_id(i);
 		size_t size = (__page_size * n) / sizeof(size_t);
 
 		for (size_t j = 0; j < size; ++j)
 			result[j] = 0;
 
-		return (void *)result;
+		return result;
 	}
 
 	// Failed to find `n` contiguous free pages
@@ -100,23 +106,23 @@ void *alloc_pages(size_t n)
 }
 
 // Attempts to allocate a single zeroed free page; NULL otherwise
-void *alloc_page(void)
+void *page_alloc(void)
 {
-	return alloc_pages(1);
+	return page_alloc_many(1);
 }
 
 // Deallocate a set of contiguous pages from a pointer returned
-// from alloc_pages()
-void dealloc_pages(void *ptr)
+// from page_alloc_many()
+void pages_dealloc(void *ptr)
 {
-	__assert(ptr != NULL, "dealloc_pages(): attempted to free NULL pointer");
+	__assert(ptr != NULL, "pages_dealloc(): attempted to free NULL pointer");
 
 	// Fetch corresponding page struct for given page address
 	size_t addr = heap_bottom + ((size_t)ptr - alloc_start) / __page_size;
 
 	__assert(
 		heap_bottom <= addr && addr < heap_bottom + __heap_size,
-		"dealloc_pages(): Variable addr = %p outside heap range [%p, %p)",
+		"pages_dealloc(): Variable addr = %p outside heap range [%p, %p)",
 		addr, heap_bottom, heap_bottom + __heap_size
 	);
 
@@ -130,7 +136,7 @@ void dealloc_pages(void *ptr)
 
 	__assert(
 		p->flags & __page_last,
-		"dealloc_pages(): Found a free page before reaching the "
+		"pages_dealloc(): Found a free page before reaching the "
 		"last page; possible double-free error occurred"
 	);
 
@@ -138,7 +144,7 @@ void dealloc_pages(void *ptr)
 	p->flags = 0;
 }
 
-void print_page_allocations(void)
+void page_print_allocation_table(void)
 {
 	struct page *ptr = (struct page *) heap_bottom;
 	size_t total = 0;
@@ -165,11 +171,11 @@ void print_page_allocations(void)
 				++i;
 
 			__assert(i < num_pages,
-				"print_page_allocations(): reached end of metadata before finding the last page"
+				"page_print_allocation_table(): reached end of metadata before finding the last page"
 			);
 
 			__assert(ptr[i].flags & __page_taken,
-				"print_page_allocations(): found free page before reaching the "
+				"page_print_allocation_table(): found free page before reaching the "
 				"last page - possible double-free error"
 			);
 

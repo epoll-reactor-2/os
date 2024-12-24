@@ -9,7 +9,7 @@
 #define __stack_pages 2
 
 // Start of virtual stack address (bottom)
-#define __stack_addr 0x100000000ull
+#define __process_stack_vaddr 0x100000000ull
 
 // Start of process virtual address space
 #define __process_start_addr 0x80000000ull
