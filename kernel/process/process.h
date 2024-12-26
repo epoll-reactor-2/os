@@ -8,11 +8,8 @@
 // Number of pages per process stack
 #define __stack_pages 2
 
-// Start of virtual stack address (bottom)
-#define __process_stack_vaddr 0x100000000ull
-
-// Start of process virtual address space
-#define __process_start_addr 0x80000000ull
+#define __process_stack_vaddr	0x100000000ull
+#define __process_start_addr	0x80000000ull
 
 // Init process - hardcoded for now, for testing purposes only
 void process_init(void);
@@ -52,13 +49,15 @@ static inline const char *process_state_string(int state)
 // in assembly
 struct process {
 	char			name[32];
-	struct trap_frame 	*frame;		// process[535:0]
-	void 			*stack;		// process[543:536]
-	size_t 			pc;		// process[551:544]
-	uint16_t 		pid;		// process[553:552]
-	struct page_table 	*pages;		// process[567:560]
-	size_t 			state;		// process[575:568]
-	size_t 			sleep_until;	// process[583:576]
+	struct trap_frame 	*frame;
+	void 			*stack;
+	size_t 			pc;
+	size_t			sp;
+	uint16_t 		pid;
+	struct page_table 	*pages;
+	struct page_table 	*heap;
+	size_t 			state;
+	size_t 			sleep_until;
 };
 
 // Create a new process from function pointer

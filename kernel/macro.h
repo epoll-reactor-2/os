@@ -9,7 +9,7 @@
 
 #define __halt() ({                                    \
        __set_mie(0);                                   \
-       asm volatile ("wfi");                           \
+       __asm__ __volatile__ ("wfi");                   \
 })
 
 #define __panic(format, ...) ({\

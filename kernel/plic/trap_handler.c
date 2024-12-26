@@ -27,6 +27,8 @@ size_t m_mode_trap_handler(size_t epc, size_t tval, size_t cause, size_t hart,
 	size_t return_pc = epc;
 	size_t exception_code = __cause_exception_code(cause);
 
+	printk("trap handler sp: %x\n", frame->regs[2]);
+
 	if (__cause_is_interrupt(cause)) {
 		switch (exception_code) {
 		case 7: {
@@ -81,6 +83,12 @@ size_t m_mode_trap_handler(size_t epc, size_t tval, size_t cause, size_t hart,
 
 	} else {
 		switch (exception_code) {
+		case 1:
+			printk("Instruction address misaligned at EPC: %p\n", epc);
+			printk("Stack pointer (sp): %p\n", frame->regs[2]);
+   			__halt();
+			break;
+
 		case 2:
 			// Illegal instruction
 			kprintf("--- Kernel panic ---\n");
@@ -100,10 +108,20 @@ size_t m_mode_trap_handler(size_t epc, size_t tval, size_t cause, size_t hart,
 			__halt();
 			break;
 
-		case 8:
-			// U-mode syscall
-			return_pc = do_syscall(return_pc, frame);
+		case 8: {
+			uint64_t sp;
+			__asm__ __volatile__ ("mv %0, sp" : "=r"(sp));
+			__asm__ __volatile__ (
+				"mv a0, %1\n"		/* 0 argument		*/
+				"mv a1, %2\n"		/* 1 argument		*/
+				"mv sp, %3\n"		/* Stack pointer	*/
+				"call do_syscall\n"
+				: "=r"(return_pc)	/* Get return value	*/
+				:  "r"(return_pc), "r"(frame), "r"(frame->regs[2])
+			);
+			__asm__ __volatile__ ("mv sp, %0" :: "r"(sp));
 			break;
+		}
 
 		case 13:
 			// Load page fault

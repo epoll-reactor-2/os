@@ -217,19 +217,18 @@ make_syscall:
 	ecall
 	ret
 
+# a0 - frame address
+# a1 - program counter
+# a2 - SATP register
 .global switch_to_user
 switch_to_user:
-	# a0 - frame address
-	csrw mscratch, a0
 
 	# Set MPP=0 (U-mode), MPIE=1, SPIE=1
 	li t0, (0b00 << 11) | (1 << 7) | (1 << 5)
 	csrw mstatus, t0
 
-	# a1 - program counter
+	csrw mscratch, a0
 	csrw mepc, a1
-
-	# a2 - SATP register
 	csrw satp, a2
 
 	# Enable external, timer and software interrupts from

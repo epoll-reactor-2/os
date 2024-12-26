@@ -7,8 +7,8 @@ size_t do_syscall(size_t mepc, struct trap_frame *frame)
 	// a0 = x10
 	size_t syscall_number = frame->regs[10];
 
-	static int a = 0;
-	static int b = 0;
+	int a = 0;
+	int b = 0;
 
 	switch (syscall_number) {
 	case __syscall_exit:
@@ -18,10 +18,10 @@ size_t do_syscall(size_t mepc, struct trap_frame *frame)
 	case __syscall_test:
 		/* It is easy to notice, that each process has same address
 		   space. Separate it. */
-		printk("process stack: %8x, %d\n", &a, a);
-		printk("process stack: %8x, %d\n", &b, b);
 		++a;
 		++b;
+		printk("process stack: %8x, %d\n", &a, a);
+		printk("process stack: %8x, %d\n", &b, b);
 		printk("__syscall_test()\n");
 		return mepc + 4;
 
@@ -30,4 +30,5 @@ size_t do_syscall(size_t mepc, struct trap_frame *frame)
 		// bring down the system
 		__panic("do_syscall(): unknown system call %d\n", syscall_number);
 	}
+
 }

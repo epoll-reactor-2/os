@@ -28,22 +28,22 @@
 #define __mtimecmp_addr		0x02004000ull
 #define __mtime_addr		0x0200BFF8ull
 
-#define __get_mscratch() ({\
-	size_t _mscratch;					\
-	asm volatile ("csrr %0, mscratch" : "=r"(_mscratch));	\
-	_mscratch;						\
+#define __get_mscratch() ({							\
+	size_t _mscratch;							\
+	__asm__ __volatile__ ("csrr %0, mscratch" : "=r"(_mscratch));		\
+	_mscratch;								\
 })
 
-#define __set_mscratch(mscratch) ({				\
-	asm volatile ("csrw mscratch, %0" :: "r"((size_t)(mscratch))); \
+#define __set_mscratch(mscratch) ({						\
+	__asm__ __volatile__ ("csrw mscratch, %0" :: "r"((size_t)(mscratch)));	\
 })
 
-#define __set_sscratch(sscratch) ({				\
-	asm volatile ("csrw sscratch, %0" :: "r"((size_t)(sscratch))); \
+#define __set_sscratch(sscratch) ({						\
+	__asm__ __volatile__ ("csrw sscratch, %0" :: "r"((size_t)(sscratch)));	\
 })
 
-#define __set_mie(mie) ({					\
-	asm volatile ("csrw mie, %0" :: "r"((size_t)(mie)));	\
+#define __set_mie(mie) ({							\
+	__asm__ __volatile__ ("csrw mie, %0" :: "r"((size_t)(mie)));		\
 })
 
 void set_timer_interrupt_delay_us(size_t);
