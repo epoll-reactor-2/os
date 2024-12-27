@@ -8,7 +8,7 @@
 // Number of pages per process stack
 #define __stack_pages 2
 
-#define __process_stack_vaddr	0x100000000ull
+#define __process_stack_vaddr	0x10000000ull
 #define __process_start_addr	0x80000000ull
 
 // Init process - hardcoded for now, for testing purposes only

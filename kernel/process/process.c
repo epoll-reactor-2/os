@@ -20,7 +20,7 @@ void process_init(void)
 		for (size_t i = 0; i < 30000000; ++i)
 			;
 
-		make_syscall(1);
+		make_syscall(__syscall_test);
 	}
 }
 
@@ -34,20 +34,24 @@ static inline void process_map_stack(struct process *process)
 
 	// page_alloc() allocates physical addresses.
 	uint64_t stack_paddr = (uint64_t) process->stack;
+	uint64_t stack_vaddr = __process_stack_vaddr;
 	// Set stack pointer to point to top of process stack
-	process->frame->regs[2] = stack_paddr;
+	//
+	// NOTE: Works with physical address, not virtual.
+	// process->frame->regs[2] = stack_paddr;
+	process->frame->regs[2] = stack_paddr + (__stack_pages * __page_size);
 
 	// Map process stack to virtual memory
 	for (size_t i = 0; i < __stack_pages; ++i) {
 		map(process->pages,
-			(uint64_t) process->stack + i * __page_size,
-			(uint64_t) stack_paddr    + i * __page_size,
+			(uint64_t) stack_vaddr + i * __page_size,
+			(uint64_t) stack_paddr + i * __page_size,
 			__pte_user_rw, 0);
 
 		printk("pid %3d: mapped stack: virt 0x%8x to phys 0x%8x\n",
 			process->pid,
-			(uint64_t) process->stack + i * __page_size,
-			(uint64_t) stack_paddr    + i * __page_size
+			(uint64_t) stack_vaddr + i * __page_size,
+			(uint64_t) stack_paddr + i * __page_size
 		);
 	}
 }
